@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>세계화 탐구 활동지 | 상품 하나가 완성되기까지</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<style>
+:root{
+  --navy:#1E2A44; --navy-2:#2C3E63; --slate:#4A6FA5; --slate-soft:#EAF0F8;
+  --line:#DDE3EC; --bg:#F4F6FA; --paper:#FFFFFF; --text:#26303F; --muted:#6B7789;
+  --s1:#2563EB; --s2:#16A34A; --s3:#DC2626; --s4:#E9A100;
+}
+*{ box-sizing:border-box; }
+body{
+  margin:0; padding:28px 16px 80px; background:var(--bg);
+  font-family:'Noto Sans KR',system-ui,sans-serif; color:var(--text);
+  font-size:15px; line-height:1.7; -webkit-font-smoothing:antialiased;
+}
+.app{ max-width:960px; margin:0 auto; }
+
+.topbar{ background:var(--navy); color:#fff; border-radius:14px 14px 0 0; padding:22px 26px 18px; }
+.topbar h1{ font-size:20px; font-weight:700; margin:0 0 4px; letter-spacing:-.4px; }
+.topbar p{ margin:0; font-size:13.5px; color:#A9B7CE; }
+
+.progress{ background:var(--navy-2); padding:16px 26px 18px; display:flex; }
+.pstep{ flex:1; text-align:center; position:relative; color:#8C9BB5; font-size:12.5px;
+  font-weight:500; cursor:pointer; background:none; border:none; font-family:inherit; padding:0; }
+.pstep .dot{ width:28px; height:28px; margin:0 auto 6px; border-radius:50%; background:#3C4E74;
+  color:#A9B7CE; display:flex; align-items:center; justify-content:center; font-weight:700;
+  font-size:13px; position:relative; z-index:2; transition:background .2s, color .2s; }
+.pstep::before{ content:''; position:absolute; top:14px; left:-50%; width:100%; height:2px; background:#3C4E74; z-index:1; }
+.pstep:first-child::before{ display:none; }
+.pstep.done .dot, .pstep.active .dot{ background:#6C9BEA; color:#fff; }
+.pstep.active{ color:#fff; font-weight:700; }
+.pstep.done{ color:#C6D3E8; }
+.pstep:focus-visible{ outline:2px solid #9CC0FF; outline-offset:3px; border-radius:6px; }
+
+.stage{ background:var(--paper); border-radius:0 0 14px 14px; padding:30px 30px 26px;
+  border:1px solid var(--line); border-top:none; box-shadow:0 6px 22px rgba(30,42,68,.07); }
+.step-panel{ display:none; }
+.step-panel.on{ display:block; animation:fade .25s ease; }
+@keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
+
+h2.sec{ font-size:17px; font-weight:700; margin:0 0 4px; color:var(--navy); display:flex; align-items:center; gap:9px; }
+h2.sec span{ background:var(--slate-soft); color:var(--slate); font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:20px; }
+p.lead{ margin:0 0 22px; color:var(--muted); font-size:13.5px; }
+
+.field-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px; margin-bottom:30px; }
+label.lb{ display:block; font-size:12.5px; font-weight:500; color:var(--muted); margin-bottom:6px; }
+input[type=text]{ width:100%; font-family:inherit; font-size:14.5px; color:var(--text);
+  padding:10px 12px; border:1px solid var(--line); border-radius:9px; background:#FCFDFF; }
+input[type=text]:focus, textarea:focus, select:focus{ outline:none; border-color:var(--slate); box-shadow:0 0 0 3px rgba(74,111,165,.14); }
+button:focus-visible{ outline:2px solid var(--slate); outline-offset:2px; }
+
+.prod-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; }
+.prod{ text-align:left; font-family:inherit; cursor:pointer; background:#fff; border:1.5px solid var(--line);
+  border-radius:12px; padding:14px 15px; transition:border-color .15s, box-shadow .15s, background .15s; }
+.prod:hover{ border-color:var(--slate); }
+.prod.sel{ border-color:var(--navy); background:#F6F9FF; box-shadow:0 0 0 3px rgba(74,111,165,.12); }
+.prod .ic{ font-size:20px; display:block; margin-bottom:6px; }
+.prod b{ display:block; font-size:14.5px; color:var(--navy); }
+.prod small{ display:block; font-size:12px; color:var(--muted); margin-top:3px; line-height:1.5; }
+
+.info-box{ margin-top:18px; background:var(--slate-soft); border-left:3px solid var(--slate);
+  border-radius:0 10px 10px 0; padding:14px 16px; font-size:13.5px; }
+.info-box b{ color:var(--navy); }
+.info-box .hint{ color:var(--muted); font-size:12.5px; display:block; margin-top:4px; }
+.custom-wrap{ display:none; margin-top:16px; }
+.custom-wrap.on{ display:block; }
+
+.steps4{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:26px; }
+.s-card{ border:1px solid var(--line); border-radius:11px; padding:13px 15px; background:#FCFDFF; border-top:3px solid; }
+.s-card.c1{ border-top-color:var(--s1); } .s-card.c2{ border-top-color:var(--s2); }
+.s-card.c3{ border-top-color:var(--s3); } .s-card.c4{ border-top-color:var(--s4); }
+.s-card em{ font-style:normal; font-size:11.5px; font-weight:700; letter-spacing:.3px; }
+.c1 em{ color:var(--s1); } .c2 em{ color:var(--s2); } .c3 em{ color:var(--s3); } .c4 em{ color:var(--s4); }
+.s-card b{ display:block; font-size:14px; margin:3px 0 4px; color:var(--navy); }
+.s-card small{ font-size:12.5px; color:var(--muted); line-height:1.55; }
+.s-card .flowmark{ display:block; margin-top:6px; font-size:11.5px; font-weight:500; color:var(--slate); }
+
+/* 진행 상황 트랙 */
+.order-track{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+.otrack{ flex:1 1 150px; border:1px solid var(--line); border-radius:10px; padding:8px 11px;
+  background:#F7F9FC; font-size:12px; color:#A6B0BE; position:relative; }
+.otrack b{ display:block; font-size:12.5px; font-weight:700; }
+.otrack.done{ background:#fff; color:var(--muted); }
+.otrack.done b{ color:var(--navy); }
+.otrack.now{ background:#FFFDF3; border-color:#E9C46A; box-shadow:0 0 0 3px rgba(233,196,106,.2); color:#8A6D1F; }
+.otrack.now b{ color:#8A6D1F; }
+.otrack .mark{ position:absolute; top:8px; right:10px; font-size:11px; font-weight:700; }
+
+.map-bar{ display:flex; flex-wrap:wrap; gap:9px; align-items:center; margin-bottom:12px; }
+select{ font-family:inherit; font-size:14px; color:var(--text); padding:9px 12px;
+  border:1px solid var(--line); border-radius:9px; background:#FCFDFF; cursor:pointer; }
+select#countrySel{ flex:1 1 240px; }
+#map{ height:380px; border-radius:11px; border:1px solid var(--line); z-index:0; background:#DCE6F2; }
+
+.pin{ width:26px; height:26px; border-radius:50% 50% 50% 2px; transform:rotate(45deg);
+  border:2px solid #fff; box-shadow:0 2px 5px rgba(0,0,0,.32); display:flex; align-items:center; justify-content:center; }
+.pin i{ transform:rotate(-45deg); font-style:normal; color:#fff; font-size:11px; font-weight:700; }
+.pin.hub{ width:34px; height:34px; border-width:3px; }
+.pin.hub i{ font-size:12px; }
+.hublabel{ background:#fff; border:1px solid var(--s3); color:var(--s3); font-size:10.5px; font-weight:700;
+  padding:1px 6px; border-radius:20px; white-space:nowrap; box-shadow:0 1px 3px rgba(0,0,0,.15); }
+
+.legend{ display:flex; flex-wrap:wrap; gap:14px; font-size:12px; color:var(--muted); margin-top:12px; align-items:center; }
+.legend i{ width:9px; height:9px; border-radius:50%; display:inline-block; margin-right:5px; }
+.legend .arrowkey{ display:inline-block; width:22px; height:0; border-top:2px dashed #9AA5B4; vertical-align:middle; margin-right:5px; }
+
+.hub-note{ margin-top:12px; font-size:12.5px; color:var(--navy); background:#FFF6F5;
+  border:1px solid #F6D6D3; border-radius:9px; padding:9px 12px; }
+
+.groups{ margin-top:14px; display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:10px; }
+.grp{ border:1px solid var(--line); border-radius:10px; padding:9px 11px; background:#FCFDFF; border-left:3px solid; }
+.grp h4{ margin:0 0 5px; font-size:11.5px; font-weight:700; letter-spacing:.2px; }
+.grp .items{ display:flex; flex-wrap:wrap; gap:5px; }
+.chip{ display:inline-flex; align-items:center; gap:5px; border-radius:6px; padding:3px 8px;
+  font-size:11.5px; color:#fff; font-weight:500; line-height:1.5; }
+.chip button{ background:rgba(255,255,255,.3); border:none; color:#fff; border-radius:3px;
+  width:14px; height:14px; line-height:1; cursor:pointer; font-size:10px; padding:0; }
+.grp .empty{ font-size:11.5px; color:#A6B0BE; }
+
+.q{ border:1px solid var(--line); border-radius:12px; padding:16px 18px; margin-bottom:14px; background:#FCFDFF; }
+.q h3{ font-size:14.5px; margin:0 0 3px; color:var(--navy); }
+.q h3 em{ font-style:normal; color:var(--slate); font-weight:700; margin-right:6px; }
+.q p{ margin:0 0 11px; font-size:12.8px; color:var(--muted); }
+textarea{ width:100%; font-family:inherit; font-size:14px; line-height:1.65; color:var(--text);
+  border:1px solid var(--line); border-radius:9px; padding:11px 13px; background:#fff;
+  min-height:96px; resize:vertical; word-break:break-all; white-space:pre-wrap; }
+.counter{ text-align:right; font-size:11.5px; color:#9AA5B4; margin-top:4px; }
+
+/* Step 3 · Q1 에서 다시 보는 Step 2 결과 */
+.recall{ border:1px dashed #C3D0E4; background:#F7FAFF; border-radius:10px; padding:12px 14px; margin-bottom:12px; }
+.recall .rc-head{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:8px; }
+.recall .rc-head b{ font-size:12.5px; color:var(--navy); }
+.recall .rc-head span{ font-size:11.5px; color:var(--muted); }
+.recall .groups{ margin-top:0; }
+.recall .grp{ background:#fff; }
+#q1MapSlot #map{ height:250px; margin-bottom:10px; }
+.rc-toggle{ font-family:inherit; font-size:11.5px; color:var(--slate); background:#fff;
+  border:1px solid var(--line); border-radius:7px; padding:4px 10px; cursor:pointer; white-space:nowrap; }
+.rc-toggle:hover{ background:#F2F5FA; }
+.recall.hide-map #q1MapSlot{ display:none; }
+
+/* Q2 · 예시 자료 카드 */
+.datacard{ border:1px solid var(--line); background:#fff; border-radius:11px; padding:14px 16px; margin-bottom:12px; }
+.dc-head b{ display:block; font-size:13px; color:var(--navy); }
+.dc-head span{ display:block; font-size:11px; color:#9AA5B4; margin-bottom:10px; }
+.bars{ display:flex; flex-direction:column; gap:7px; }
+.bar-row{ display:grid; grid-template-columns:120px 1fr 42px 62px; align-items:center; gap:9px; }
+.bar-row .bl{ font-size:11.8px; line-height:1.35; color:var(--text); }
+.bar-row .bl i{ font-style:normal; font-size:10.5px; color:#9AA5B4; }
+.bar-row .track{ background:#EFF2F7; border-radius:5px; height:15px; overflow:hidden; }
+.bar-row .track i{ display:block; height:100%; border-radius:5px; }
+.bar-row b{ font-size:12px; text-align:right; color:var(--navy); }
+.bar-row em{ font-style:normal; font-size:11px; text-align:right; color:var(--muted); }
+.dc-ask{ margin:12px 0 10px; padding-left:18px; font-size:12.3px; color:var(--muted); }
+.dc-ask li{ margin-bottom:3px; }
+.peek-btn{ font-family:inherit; font-size:12.3px; color:var(--navy); background:#FFF8E6;
+  border:1px solid #EFD9A0; border-radius:20px; padding:6px 14px; cursor:pointer; }
+.peek-btn:hover{ background:#FDF0CE; }
+.peek-btn[aria-expanded="true"]{ background:#EFF3FA; border-color:var(--line); color:var(--slate); }
+.peek{ margin-top:10px; background:#F7FAFF; border:1px dashed #C3D0E4; border-radius:10px; padding:11px 14px; }
+.peek b{ display:block; font-size:12px; color:var(--slate); margin-bottom:4px; }
+.peek p{ margin:0 0 6px; font-size:12.6px; color:var(--text); line-height:1.65; }
+.peek-note{ font-size:11.3px; color:#9AA5B4; }
+
+/* Q3 · 낱말 힌트 칩 */
+.wordbox{ margin-bottom:12px; }
+.wb-title{ display:block; font-size:12.3px; color:var(--muted); margin-bottom:8px; }
+.wb-title b{ color:var(--navy); }
+.wordchips{ display:flex; flex-wrap:wrap; gap:8px; }
+.wchip{ display:inline-flex; flex-direction:column; background:#fff; border:1.5px solid var(--line);
+  border-radius:10px; padding:6px 12px; font-size:13px; font-weight:500; color:var(--navy);
+  border-left-width:4px; line-height:1.35; }
+.wchip i{ font-style:normal; font-size:10.8px; font-weight:400; color:#9AA5B4; margin-top:1px; }
+.wchip.c-s1{ border-left-color:var(--s1); }
+.wchip.c-s2{ border-left-color:var(--s2); }
+.wchip.c-s3{ border-left-color:var(--s3); }
+.wchip.c-s4{ border-left-color:var(--s4); }
+
+.nav{ display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:26px; padding-top:20px; border-top:1px solid var(--line); }
+.nav-left{ display:flex; align-items:center; gap:12px; }
+button.btn{ font-family:inherit; font-size:14px; font-weight:500; padding:11px 22px; border-radius:9px; border:1px solid transparent; cursor:pointer; transition:background .15s; }
+.btn-primary{ background:var(--navy); color:#fff; } .btn-primary:hover{ background:var(--navy-2); }
+.btn-ghost{ background:#fff; color:var(--navy); border-color:var(--line); } .btn-ghost:hover{ background:#F2F5FA; }
+.btn-accent{ background:var(--slate); color:#fff; } .btn-accent:hover{ background:#3D5E8E; }
+.btn:disabled{ opacity:.4; cursor:not-allowed; }
+.savestate{ font-size:12px; color:#9AA5B4; }
+.gate{ font-size:12.5px; color:var(--muted); }
+.gate b{ color:var(--navy); }
+.gate.ok b{ color:#16A34A; }
+
+.report-tools{ display:flex; flex-wrap:wrap; gap:9px; align-items:center; margin-bottom:18px; }
+.report-scroll{ overflow-x:auto; background:#E9EDF4; border-radius:12px; padding:20px; }
+#report{ width:800px; min-height:1120px; margin:0 auto; background:#fff; padding:36px 40px 28px;
+  border:1px solid #D6DCE6; font-size:12.6px; line-height:1.6; color:#26303F; }
+#report .r-head{ border-bottom:2.5px solid var(--navy); padding-bottom:12px; margin-bottom:15px; }
+#report .r-head h1{ font-size:19px; margin:0 0 3px; color:var(--navy); letter-spacing:-.5px; }
+#report .r-head p{ margin:0; font-size:11.5px; color:var(--muted); }
+#report .r-meta{ display:flex; border:1px solid var(--line); border-radius:8px; overflow:hidden; margin-bottom:16px; }
+#report .r-meta div{ flex:1; padding:7px 12px; border-right:1px solid var(--line); }
+#report .r-meta div:last-child{ border-right:none; }
+#report .r-meta span{ display:block; font-size:10.5px; color:var(--muted); }
+#report .r-meta b{ font-size:12.5px; font-weight:500; }
+#report h2.rt{ font-size:12.5px; color:#fff; background:var(--navy); display:inline-block; padding:3px 11px; border-radius:5px; margin:0 0 8px; }
+#report section{ margin-bottom:15px; }
+#report .r-prod{ border:1px solid var(--line); border-radius:8px; padding:10px 13px; background:#FAFBFD; }
+#report .r-prod b{ font-size:13.5px; color:var(--navy); }
+#reportMapSlot #map{ height:235px; border-radius:8px; }
+#report .groups{ margin-top:8px; gap:7px; }
+#report .grp{ padding:7px 9px; }
+#report .r-ans{ border:1px solid var(--line); border-radius:8px; padding:9px 12px; margin-bottom:8px; background:#FAFBFD; }
+#report .r-ans strong{ display:block; font-size:11.8px; color:var(--navy); margin-bottom:3px; }
+#report .r-ans .txt{ white-space:pre-wrap; word-break:break-all; font-size:12px; min-height:32px; color:#2F3A4B; }
+#report .r-foot{ border-top:1px solid var(--line); margin-top:16px; padding-top:9px; display:flex; justify-content:space-between; font-size:11px; color:var(--muted); }
+
+.teacher-note{ margin-top:18px; text-align:center; font-size:13px; color:var(--navy); background:var(--slate-soft); border-radius:10px; padding:12px; }
+.status{ font-size:12.5px; color:var(--slate); min-height:20px; }
+
+@media (prefers-reduced-motion: reduce){ *{ animation:none !important; transition:none !important; } }
+@media (max-width:640px){
+  body{ padding:14px 10px 60px; }
+  .stage{ padding:22px 16px; }
+  .topbar,.progress{ padding-left:16px; padding-right:16px; }
+  .pstep{ font-size:0; } .pstep .dot{ margin-bottom:0; }
+  .report-scroll{ padding:10px; }
+  .nav{ flex-wrap:wrap; }
+  .bar-row{ grid-template-columns:96px 1fr 36px; }
+  .bar-row em{ display:none; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <h1>상품 하나가 완성되기까지 — 세계화 탐구 활동지</h1>
+    <p>중학교 1학년 사회 · 여러 나라가 나누어 일하는 과정을 조사하고 보고서로 정리해 봅시다.</p>
+  </div>
+
+  <nav class="progress" aria-label="진행 단계">
+    <button class="pstep active" data-go="1"><span class="dot">1</span>정보·상품 선택</button>
+    <button class="pstep" data-go="2"><span class="dot">2</span>개념·지도</button>
+    <button class="pstep" data-go="3"><span class="dot">3</span>탐구 질문</button>
+    <button class="pstep" data-go="4"><span class="dot">4</span>보고서·제출</button>
+  </nav>
+
+  <main class="stage">
+
+  <!-- ============ STEP 1 ============ -->
+  <section class="step-panel on" id="panel1">
+    <h2 class="sec">기본 정보 입력 <span>STEP 1</span></h2>
+    <p class="lead">보고서에 들어갈 정보예요. 정확하게 적어 주세요.</p>
+
+    <div class="field-grid">
+      <div><label class="lb" for="school">학교명</label><input type="text" id="school" data-save placeholder="○○중학교"></div>
+      <div><label class="lb" for="classno">학년 / 반 / 번호</label><input type="text" id="classno" data-save placeholder="1학년 3반 12번"></div>
+      <div><label class="lb" for="student">이름</label><input type="text" id="student" data-save placeholder="홍길동"></div>
+    </div>
+
+    <h2 class="sec">탐구할 상품 고르기 <span>STEP 1</span></h2>
+    <p class="lead">여러 나라의 손을 거쳐 만들어지는 상품 하나를 골라 봅시다.</p>
+
+    <div class="prod-grid" id="prodGrid"></div>
+
+    <div class="info-box" id="prodInfo">
+      <b>상품을 선택하면 소개와 참여 국가 힌트가 나타납니다.</b>
+      <span class="hint">직접 고른 상품으로 조사하고 싶다면 ‘직접 입력’을 선택하세요.</span>
+    </div>
+
+    <div class="custom-wrap" id="customWrap">
+      <div class="field-grid" style="margin-bottom:0">
+        <div><label class="lb" for="customName">내가 고른 상품 이름</label><input type="text" id="customName" data-save placeholder="예) 내 필통 속 샤프"></div>
+        <div><label class="lb" for="customOrigin">라벨에서 확인한 원산지</label><input type="text" id="customOrigin" data-save placeholder="예) Made in Japan"></div>
+      </div>
+    </div>
+
+    <div class="nav">
+      <span class="savestate" id="saveState">임시 저장 준비 중…</span>
+      <button class="btn btn-primary" data-next="2">다음 단계 →</button>
+    </div>
+  </section>
+
+  <!-- ============ STEP 2 ============ -->
+  <section class="step-panel" id="panel2">
+    <h2 class="sec">상품 하나가 완성되는 4가지 비밀 단계 <span>STEP 2</span></h2>
+    <p class="lead">우리가 쓰는 물건은 대부분 아래 네 단계를 거쳐 완성됩니다.</p>
+
+    <div class="steps4">
+      <div class="s-card c1"><em>1단계</em><b>아이디어 내기 &amp; 모양 그리기</b>
+        <small>“어떤 물건을 만들까?” 계획하고 디자인하는 단계. 기술과 연구 능력이 필요합니다.</small>
+        <span class="flowmark">→ 설계도가 공장 나라로 전달됩니다.</span></div>
+      <div class="s-card c2"><em>2단계</em><b>재료 구하기</b>
+        <small>목화, 석유, 금속처럼 바탕이 되는 재료를 모으는 단계.</small>
+        <span class="flowmark">→ 여러 나라에서 동시에 재료를 가져옵니다.</span></div>
+      <div class="s-card c3"><em>3단계</em><b>부품 만들고 연결하기</b>
+        <small>재료로 부품을 만들고 조립해 완성품으로 만드는 단계.</small>
+        <span class="flowmark">→ 재료가 한곳에 모여 완제품이 만들어집니다.</span></div>
+      <div class="s-card c4"><em>4단계</em><b>알리고 가게로 보내기</b>
+        <small>광고로 널리 알리고 전 세계 매장까지 배송하는 단계.</small>
+        <span class="flowmark">→ 전 세계 소비자에게 전달됩니다.</span></div>
+    </div>
+
+    <h2 class="sec">참여 국가 지도로 나타내기 <span>STEP 2</span></h2>
+    <p class="lead">목록에 있는 나라가 각각 <b>어느 단계의 일</b>을 맡았는지 스스로 판단해 골라 보세요. <b>한 단계에 해당하는 나라를 모두 찾아야</b> 다음 단계로 넘어갈 수 있고, 순서가 맞지 않으면 등록되지 않습니다.</p>
+
+    <div class="order-track" id="orderTrack"></div>
+
+    <div class="map-bar">
+      <select id="countrySel" aria-label="참여 국가 선택"><option value="">국가 선택…</option></select>
+      <select id="stepSel" aria-label="담당 단계 선택" style="display:none"></select>
+      <button class="btn btn-ghost" id="btnReset" style="padding:9px 14px;font-size:13px">핀 초기화</button>
+    </div>
+
+    <div id="mapHost"><div id="map"></div></div>
+
+    <div class="legend">
+      <span><i style="background:var(--s1)"></i>1단계 아이디어</span>
+      <span><i style="background:var(--s2)"></i>2단계 재료</span>
+      <span><i style="background:var(--s3)"></i>3단계 부품·조립</span>
+      <span><i style="background:var(--s4)"></i>4단계 배송·판매(우리나라)</span>
+      <span><span class="arrowkey"></span>모여드는 흐름 / 퍼져 나가는 흐름</span>
+    </div>
+
+    <p class="hub-note" id="hubNote">3단계(부품 만들고 연결하기) 국가를 선택하면, 그 나라가 중심 공장이 되어 화살표가 모입니다.</p>
+
+    <div class="groups" id="groups"></div>
+
+    <div class="nav">
+      <div class="nav-left">
+        <button class="btn btn-ghost" data-next="1">← 이전</button>
+        <span class="gate" id="gateInfo"></span>
+      </div>
+      <button class="btn btn-primary" data-next="3">다음 단계 →</button>
+    </div>
+  </section>
+
+  <!-- ============ STEP 3 ============ -->
+  <section class="step-panel" id="panel3">
+    <h2 class="sec">탐구 질문에 답하기 <span>STEP 3</span></h2>
+    <p class="lead">앞에서 정리한 지도와 국가 목록을 참고해 자기 생각을 써 봅시다.</p>
+
+    <div class="q">
+      <h3><em>Q1.</em> 지도로 분류하기</h3>
+      <p>내가 고른 상품의 제작 과정을 ‘4가지 비밀 단계’로 나누어 정리해 보세요. (어느 나라가 어떤 일을 맡았나요?)</p>
+
+      <div class="recall" id="recall">
+        <div class="rc-head">
+          <b>내가 STEP 2에서 표시한 지도와 나라</b>
+          <button type="button" class="rc-toggle" id="rcToggle">지도 접기</button>
+        </div>
+        <div id="q1MapSlot"></div>
+        <div class="groups" id="q1Groups"></div>
+      </div>
+
+      <textarea id="q1" data-save placeholder="1단계 아이디어 내기 :&#10;2단계 재료 구하기 :&#10;3단계 부품 만들고 연결하기 :&#10;4단계 알리고 가게로 보내기 :"></textarea>
+      <div class="counter" data-count="q1">0자</div>
+    </div>
+
+    <div class="q">
+      <h3><em>Q2.</em> 이익 생각하기</h3>
+      <p>‘아이디어를 내는 단계’와 ‘공장에서 부품을 만들고 조립하는 단계’ 중 어느 쪽이 더 많은 남는 이익(돈)을 가져갈까요? 아래 자료를 살펴보고, 그렇게 생각한 이유도 함께 적어 보세요.</p>
+
+      <div class="datacard">
+        <div class="dc-head">
+          <b id="dcTitle">상품을 선택하면 그 상품의 자료가 나타납니다.</b>
+          <span id="dcNote">교육용으로 단순하게 만든 예시 자료입니다.</span>
+        </div>
+
+        <div class="bars" id="dcBars"></div>
+
+        <ul class="dc-ask" id="dcAsk"></ul>
+
+        <button type="button" class="peek-btn" data-peek="peekQ2" aria-expanded="false">💡 예시 살짝 보기</button>
+        <div class="peek" id="peekQ2" hidden>
+          <b>이렇게 쓸 수 있어요</b>
+          <p id="peekText"></p>
+          <span class="peek-note">그대로 옮겨 적지 말고, 자료에서 내가 찾은 숫자와 내 생각을 넣어 다시 써 보세요.</span>
+        </div>
+      </div>
+
+      <textarea id="q2" data-save placeholder="내 생각 :&#10;그렇게 생각한 이유 :"></textarea>
+      <div class="counter" data-count="q2">0자</div>
+    </div>
+
+    <div class="q">
+      <h3><em>Q3.</em> 나누어 일하는 이유</h3>
+      <p>기업은 왜 한 나라에서 전부 만들지 않고, 여러 나라에서 재료를 사고 공장을 돌릴까요?</p>
+
+      <div class="wordbox">
+        <span class="wb-title">🔑 이 낱말 중 <b>두 개 이상</b>을 넣어 써 보세요.</span>
+        <div class="wordchips">
+          <span class="wchip c-s2">자연환경<i>재료가 잘 자라는 곳</i></span>
+          <span class="wchip c-s1">기술<i>아무나 만들 수 없는 것</i></span>
+          <span class="wchip c-s3">일손<i>사람이 많이 필요한 일</i></span>
+          <span class="wchip c-s3">값<i>더 싸게 만들기</i></span>
+          <span class="wchip c-s4">운송<i>배·비행기로 옮기기</i></span>
+        </div>
+      </div>
+
+      <textarea id="q3" data-save placeholder="여러 나라가 나누어 일하는 까닭은…"></textarea>
+      <div class="counter" data-count="q3">0자</div>
+    </div>
+
+    <div class="nav">
+      <div class="nav-left">
+        <button class="btn btn-ghost" data-next="2">← 이전</button>
+        <span class="gate" id="gateQ"></span>
+      </div>
+      <button class="btn btn-primary" data-next="4">보고서 만들기 →</button>
+    </div>
+  </section>
+
+  <!-- ============ STEP 4 ============ -->
+  <section class="step-panel" id="panel4">
+    <h2 class="sec">보고서 확인 및 제출 <span>STEP 4</span></h2>
+    <p class="lead">A4 한 장 분량으로 정리된 보고서입니다. 내용을 확인한 뒤 파일로 저장하세요.</p>
+
+    <div class="report-tools">
+      <button class="btn btn-primary" id="btnPdf">PDF 파일로 저장</button>
+      <button class="btn btn-accent" id="btnPng">PNG 이미지로 저장</button>
+      <button class="btn btn-ghost" data-next="3">이전 단계로 돌아가 수정하기</button>
+      <span class="status" id="status"></span>
+    </div>
+
+    <div class="report-scroll">
+      <div id="report">
+        <div class="r-head">
+          <h1>여러 나라가 함께 만드는 상품 탐구 보고서</h1>
+          <p>중학교 1학년 사회 · 상품 하나가 완성되는 4가지 비밀 단계 알아보기</p>
+        </div>
+
+        <div class="r-meta">
+          <div><span>학교</span><b id="rSchool">-</b></div>
+          <div><span>학년 / 반 / 번호</span><b id="rClass">-</b></div>
+          <div><span>이름</span><b id="rName">-</b></div>
+          <div><span>작성일</span><b id="rDate">-</b></div>
+        </div>
+
+        <section>
+          <h2 class="rt">1. 내가 고른 상품</h2>
+          <div class="r-prod"><b id="rProd">-</b><div id="rProdDesc" style="color:#6B7789;margin-top:2px;">-</div></div>
+        </section>
+
+        <section>
+          <h2 class="rt">2. 상품이 거쳐 간 나라와 흐름</h2>
+          <div id="reportMapSlot"></div>
+          <div class="groups" id="rGroups"></div>
+        </section>
+
+        <section>
+          <h2 class="rt">3. 탐구 질문에 대한 나의 답</h2>
+          <div class="r-ans"><strong>Q1. 제작 과정을 4가지 비밀 단계로 분류하기</strong><div class="txt" id="rQ1"></div></div>
+          <div class="r-ans"><strong>Q2. 어느 단계가 남는 이익(돈)을 더 많이 가져갈까?</strong><div class="txt" id="rQ2"></div></div>
+          <div class="r-ans"><strong>Q3. 기업이 여러 나라에 나누어 일을 맡기는 까닭</strong><div class="txt" id="rQ3"></div></div>
+        </section>
+
+        <div class="r-foot">
+          <span>상품 하나가 완성되기까지 — 세계화 탐구 활동지</span>
+          <span id="rFootName">-</span>
+        </div>
+      </div>
+    </div>
+
+    <p class="teacher-note">저장된 파일은 스쿨워크에 제출하세요.</p>
+  </section>
+
+  </main>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+/* =====================================================
+   단계 정의
+   ===================================================== */
+const STEP_COLOR = {1:'#2563EB', 2:'#16A34A', 3:'#DC2626', 4:'#E9A100'};
+const STEP_LABEL = {1:'1단계 아이디어', 2:'2단계 재료', 3:'3단계 부품·조립', 4:'4단계 배송·판매'};
+const STEP_FULL  = {
+  1:'1단계(아이디어 내기)', 2:'2단계(재료 구하기)',
+  3:'3단계(부품 만들고 연결하기)', 4:'4단계(알리고 가게로 보내기)'
+};
+const STEP_SHORT = {1:'아이디어 내기', 2:'재료 구하기', 3:'부품 만들고 연결하기', 4:'알리고 가게로 보내기'};
+
+const C = {
+  us:{name:'미국', lat:39.0, lng:-98.0}, uk:{name:'영국', lat:54.0, lng:-2.0},
+  de:{name:'독일', lat:51.1, lng:10.4}, fr:{name:'프랑스', lat:46.6, lng:2.4},
+  it:{name:'이탈리아', lat:41.9, lng:12.5}, tn:{name:'튀니지', lat:34.0, lng:9.5},
+  bj:{name:'베냉', lat:9.3, lng:2.3}, jp:{name:'일본', lat:36.2, lng:138.2},
+  kr:{name:'대한민국', lat:36.5, lng:127.8}, cn:{name:'중국', lat:35.0, lng:105.0},
+  tw:{name:'대만', lat:23.7, lng:121.0}, vn:{name:'베트남', lat:16.0, lng:106.0},
+  id:{name:'인도네시아', lat:-2.5, lng:118.0}, th:{name:'태국', lat:15.0, lng:101.0},
+  in:{name:'인도', lat:22.0, lng:79.0}, au:{name:'호주', lat:-25.0, lng:134.0},
+  za:{name:'남아프리카공화국', lat:-29.0, lng:24.0}, cd:{name:'콩고민주공화국', lat:-2.9, lng:23.6},
+  cl:{name:'칠레', lat:-33.5, lng:-70.7}, sa:{name:'사우디아라비아', lat:24.0, lng:45.0},
+  br:{name:'브라질', lat:-10.0, lng:-52.0}, mx:{name:'멕시코', lat:23.6, lng:-102.5},
+  bd:{name:'방글라데시', lat:23.7, lng:90.4}, tr:{name:'튀르키예', lat:39.0, lng:35.0},
+  ca:{name:'캐나다', lat:56.0, lng:-106.0}, ph:{name:'필리핀', lat:12.9, lng:121.8}
+};
+
+/* hub:true = 재료와 부품이 모여 완제품이 되는 중심 공장 */
+const PRODUCTS = {
+  jeans:{
+    icon:'👖', label:'리바이스 청바지', tag:'옷 한 벌에 7개국 이상',
+    desc:'미국 브랜드의 청바지 한 벌에는 아프리카에서 자란 목화, 유럽에서 만든 염료와 지퍼, 북아프리카 공장의 바느질이 모두 담겨 있습니다.',
+    hint:'미국 · 일본 · 베냉 · 독일 · 이탈리아 · 프랑스 · 튀니지 · 대한민국',
+    routes:[
+      {c:'us', s:1, job:'브랜드 본사에서 디자인'},
+      {c:'jp', s:1, job:'튼튼한 지퍼 기술 개발'},
+      {c:'bj', s:2, job:'목화 재배'},
+      {c:'de', s:2, job:'청바지 염료 생산'},
+      {c:'it', s:3, job:'데님 천 짜기'},
+      {c:'fr', s:3, job:'지퍼 생산'},
+      {c:'tn', s:3, job:'재단·봉제로 완성', hub:true},
+      {c:'kr', s:4, job:'우리나라 매장에서 판매'}
+    ]
+  },
+  tumbler:{
+    icon:'🥤', label:'스탠리 텀블러', tag:'금속 자원이 만나는 물병',
+    desc:'스테인리스 텀블러는 철광석과 크로뮴 같은 금속 자원을 여러 대륙에서 모아, 아시아 공장에서 만들어 전 세계로 배송됩니다.',
+    hint:'미국 · 호주 · 남아프리카공화국 · 베트남 · 중국 · 대한민국',
+    routes:[
+      {c:'us', s:1, job:'브랜드 기획·디자인'},
+      {c:'au', s:2, job:'철광석 채굴'},
+      {c:'za', s:2, job:'크로뮴(스테인리스 재료) 채굴'},
+      {c:'vn', s:3, job:'뚜껑·부품 생산'},
+      {c:'cn', s:3, job:'본체 성형·최종 조립', hub:true},
+      {c:'kr', s:4, job:'우리나라 매장에서 판매'}
+    ]
+  },
+  phone:{
+    icon:'📱', label:'아이폰', tag:'부품 하나하나가 세계 여행',
+    desc:'스마트폰은 설계와 부품, 조립을 맡은 나라가 모두 다릅니다. 작은 기기 하나에 수십 개 나라의 기술과 자원이 들어 있습니다.',
+    hint:'미국 · 콩고민주공화국 · 칠레 · 대만 · 일본 · 중국 · 대한민국',
+    routes:[
+      {c:'us', s:1, job:'설계·소프트웨어 개발'},
+      {c:'cd', s:2, job:'배터리 재료(코발트) 채굴'},
+      {c:'cl', s:2, job:'배터리 재료(리튬) 채굴'},
+      {c:'tw', s:3, job:'핵심 반도체 생산'},
+      {c:'kr', s:3, job:'화면·메모리 부품 생산'},
+      {c:'jp', s:3, job:'카메라 부품 생산'},
+      {c:'cn', s:3, job:'최종 조립', hub:true},
+      {c:'kr', s:4, job:'우리나라 매장에서 판매'}
+    ]
+  },
+  shoes:{
+    icon:'👟', label:'나이키 운동화', tag:'고무와 석유에서 시작하는 신발',
+    desc:'운동화 밑창의 고무, 겉감의 합성 섬유는 서로 다른 나라에서 옵니다. 바느질과 조립은 주로 동남아시아 공장에서 이루어집니다.',
+    hint:'미국 · 태국 · 사우디아라비아 · 중국 · 인도네시아 · 베트남 · 대한민국',
+    routes:[
+      {c:'us', s:1, job:'디자인·광고 기획'},
+      {c:'th', s:2, job:'천연고무 생산'},
+      {c:'sa', s:2, job:'합성 섬유 재료(석유) 생산'},
+      {c:'cn', s:3, job:'밑창·부품 생산'},
+      {c:'id', s:3, job:'겉감 재봉'},
+      {c:'vn', s:3, job:'최종 조립·완성', hub:true},
+      {c:'kr', s:4, job:'우리나라 매장에서 판매'}
+    ]
+  },
+  custom:{
+    icon:'✏️', label:'직접 입력', tag:'내가 조사한 상품',
+    desc:'내 물건의 라벨을 확인하고, 어떤 나라가 어떤 일을 맡았을지 직접 조사해 지도에 표시해 보세요.',
+    hint:'국가와 담당 단계를 직접 고르되, 1단계부터 순서대로 입력해야 합니다. 네 단계를 모두 채워야 다음으로 넘어갑니다.',
+    routes:[]
+  }
+};
+
+let state = { step:1, product:'', picked:[] };
+
+/* =====================================================
+   ★ 순서 제어 : 1 → 2 → 3 → 4
+   앞 단계에 해당하는 나라를 "모두" 찾아야 다음 단계로 넘어간다
+   ===================================================== */
+function stageCount(s){ return state.picked.filter(r => r.s === s).length; }
+function stageTotal(s){                       // 그 단계에 몇 나라가 있는지 (직접 입력은 알 수 없음)
+  if(state.product === 'custom') return null;
+  const p = PRODUCTS[state.product];
+  return p ? p.routes.filter(r=>r.s===s).length : 0;
+}
+function stageComplete(s){
+  const total = stageTotal(s);
+  if(total === null) return stageCount(s) > 0;   // 직접 입력 : 최소 한 나라
+  if(total === 0) return true;                   // 그 단계에 해당 나라가 없으면 통과
+  return stageCount(s) >= total;
+}
+function missingBefore(s){ for(let i=1;i<s;i++) if(!stageComplete(i)) return i; return 0; }
+function currentStage(){ for(let i=1;i<=4;i++) if(!stageComplete(i)) return i; return 4; }
+function checkOrder(s){
+  const m = missingBefore(s);
+  if(m === 0) return true;
+  const cnt = stageCount(m), tot = stageTotal(m);
+  if(cnt === 0){
+    alert(`${STEP_FULL[m]}부터 순서대로 입력해 주세요!`);
+  }else{
+    alert(`${STEP_FULL[m]}에 해당하는 나라를 모두 찾아야 다음 단계로 넘어갈 수 있어요!\n\n지금까지 ${cnt}${tot ? ' / ' + tot : ''}곳을 표시했습니다.`);
+  }
+  return false;
+}
+
+/* ★ 완료 검사 : 목록의 나라를 모두 표시했는가 */
+function remainingItems(){
+  if(state.product === 'custom') return [1,2,3,4].filter(s=>!stageComplete(s));
+  const p = PRODUCTS[state.product];
+  if(!p) return ['상품 선택'];
+  return p.routes.filter(r=>!state.picked.some(x=>x.c===r.c && x.job===r.job));
+}
+function mapComplete(){ return !!state.product && remainingItems().length === 0; }
+
+/* =====================================================
+   상품 선택
+   ===================================================== */
+const prodGrid = document.getElementById('prodGrid');
+Object.entries(PRODUCTS).forEach(([key, p])=>{
+  const b = document.createElement('button');
+  b.className='prod'; b.dataset.key=key; b.type='button';
+  b.innerHTML = `<span class="ic">${p.icon}</span><b>${p.label}</b><small>${p.tag}</small>`;
+  b.addEventListener('click', ()=> selectProduct(key, true));
+  prodGrid.appendChild(b);
+});
+
+function selectProduct(key, reset){
+  state.product = key;
+  document.querySelectorAll('.prod').forEach(el=> el.classList.toggle('sel', el.dataset.key===key));
+  const p = PRODUCTS[key];
+  document.getElementById('prodInfo').innerHTML =
+    `<b>${p.icon} ${p.label}</b><br>${p.desc}<span class="hint">참여 국가 힌트 · ${p.hint}</span>`;
+  document.getElementById('customWrap').classList.toggle('on', key==='custom');
+  document.getElementById('stepSel').style.display = key==='custom' ? '' : 'none';
+  if(reset) state.picked = [];
+  drawMap();
+  renderCost();
+  save();
+}
+
+/* ★ 국가 선택 목록
+   - 잠김 표시(🔒)·단계 표시 없음 : 학생이 스스로 단계를 판단해야 함
+   - 이미 등록한 나라는 목록에서 빠짐
+   - 가나다순으로 섞어 두어 순서를 유추할 수 없게 함 */
+function fillCountrySelect(){
+  const sel = document.getElementById('countrySel');
+  sel.innerHTML = '<option value="">국가 선택…</option>';
+  const p = PRODUCTS[state.product];
+  if(!p) return;
+
+  if(state.product === 'custom'){
+    Object.entries(C)
+      .filter(([k])=> !state.picked.some(r=>r.c===k))
+      .sort((a,b)=> a[1].name.localeCompare(b[1].name,'ko'))
+      .forEach(([k,v])=> sel.insertAdjacentHTML('beforeend', `<option value="${k}">${v.name}</option>`));
+  }else{
+    p.routes
+      .map((r,i)=>({r,i}))
+      .filter(({r})=> !state.picked.some(x=>x.c===r.c && x.job===r.job))
+      .sort((a,b)=> C[a.r.c].name.localeCompare(C[b.r.c].name,'ko'))
+      .forEach(({r,i})=> sel.insertAdjacentHTML('beforeend',
+        `<option value="${i}">${C[r.c].name} — ${r.job}</option>`));
+  }
+
+  // 직접 입력 모드의 담당 단계 선택기 (잠김 표시 없음)
+  const stepSel = document.getElementById('stepSel');
+  if(stepSel.options.length !== 4){
+    stepSel.innerHTML = '';
+    [1,2,3,4].forEach(s=> stepSel.insertAdjacentHTML('beforeend',
+      `<option value="${s}">${s}단계 · ${STEP_SHORT[s]}</option>`));
+  }
+}
+
+/* 진행 상황 트랙 : 단계별로 몇 곳을 찾았는지 보여 줌 */
+function renderTrack(){
+  const box = document.getElementById('orderTrack');
+  const cur = currentStage();
+  box.innerHTML = '';
+  [1,2,3,4].forEach(s=>{
+    const done = stageComplete(s) && stageCount(s) > 0;
+    const now = (!stageComplete(s) && s === cur);
+    const n = stageCount(s), tot = stageTotal(s);
+    let text;
+    if(done)      text = `${n}${tot ? ' / ' + tot : ''}곳 — 모두 찾음`;
+    else if(now)  text = tot ? `${n} / ${tot}곳 찾음 — 지금 찾을 차례` : '지금 찾을 차례';
+    else          text = '아직 시작 전';
+    box.insertAdjacentHTML('beforeend',
+      `<div class="otrack ${done?'done':''} ${now?'now':''}" style="${done?`border-left:3px solid ${STEP_COLOR[s]}`:''}">
+         <b>${s}단계 · ${STEP_SHORT[s]}</b>
+         ${text}
+         <span class="mark">${done?'✓':''}</span>
+       </div>`);
+  });
+  renderGate();
+}
+
+/* 다음 단계 이동 조건 안내 */
+function renderGate(){
+  const g = document.getElementById('gateInfo');
+  if(!g) return;
+  if(!state.product){ g.textContent = '상품을 먼저 선택해 주세요.'; g.classList.remove('ok'); return; }
+  const rest = remainingItems().length;
+  if(state.product === 'custom'){
+    g.innerHTML = rest === 0
+      ? '<b>네 단계를 모두 채웠습니다.</b> 다음 단계로 넘어갈 수 있어요.'
+      : `아직 <b>${rest}개 단계</b>가 비어 있어요.`;
+  }else{
+    const total = PRODUCTS[state.product].routes.length;
+    g.innerHTML = rest === 0
+      ? `<b>${total}곳을 모두 표시했습니다.</b> 다음 단계로 넘어갈 수 있어요.`
+      : `<b>${total - rest} / ${total}</b>곳 표시함 — 남은 <b>${rest}곳</b>을 모두 찍어야 넘어갈 수 있어요.`;
+  }
+  g.classList.toggle('ok', rest === 0);
+}
+
+/* =====================================================
+   지도 : 중심 공장으로 모이고 → 퍼져 나가는 흐름
+   ===================================================== */
+/* 선·화살표는 캔버스 렌더러로 그린다.
+   Leaflet 기본값인 SVG 겹면은 width/height 속성이 없어 html2canvas가 옮겨 그리지 못하고,
+   그 결과 PDF·PNG에서 흐름선과 화살촉이 통째로 빠진다. */
+const vectorRenderer = L.canvas({ padding: 0.5 });
+const map = L.map('map', {
+  worldCopyJump:true, scrollWheelZoom:false,
+  preferCanvas:true, renderer: vectorRenderer
+}).setView([26,25], 2);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  { maxZoom:12, crossOrigin:true, attribution:'© OpenStreetMap' }).addTo(map);
+
+let markers = [], lines = [], arrows = [], flows = [], hubHalo = null, hubTag = null;
+
+function curvePts(a, b, bend=0.16, n=36){
+  const dLat=b[0]-a[0], dLng=b[1]-a[1];
+  const cx=(a[0]+b[0])/2 + dLng*bend, cy=(a[1]+b[1])/2 - dLat*bend;
+  const out=[];
+  for(let i=0;i<=n;i++){ const t=i/n, u=1-t;
+    out.push([ u*u*a[0]+2*u*t*cx+t*t*b[0], u*u*a[1]+2*u*t*cy+t*t*b[1] ]); }
+  return out;
+}
+function findHub(){
+  return state.picked.find(r=>r.hub && r.s===3) || state.picked.find(r=>r.s===3) || null;
+}
+
+/* 같은 나라가 두 단계에 걸쳐 있을 때 핀이 겹치지 않도록 살짝 비켜 놓기 */
+function pos(r){
+  const c = C[r.c];
+  if(!c) return null;
+  const same = state.picked.filter(x=>x.c===r.c);
+  const k = same.indexOf(r);
+  if(k <= 0) return [c.lat, c.lng];
+  return [c.lat - 3.2*k, c.lng + 4.0*k];
+}
+
+/* 화살촉은 지도 위 SVG 도형으로 그린다.
+   (divIcon + CSS 삼각형은 html2canvas가 옮겨 그리지 못해 PDF에서 사라짐) */
+function drawArrows(){
+  arrows.forEach(m=>map.removeLayer(m)); arrows=[];
+  flows.forEach(f=>{
+    const i  = Math.max(1, Math.floor(f.pts.length*0.6));
+    const p1 = map.latLngToContainerPoint(f.pts[i-1]);
+    const p2 = map.latLngToContainerPoint(f.pts[i]);
+    const ang = Math.atan2(p2.y-p1.y, p2.x-p1.x);
+    const LEN = 13, HALF = 6;                       // 화면 기준 크기(px)
+    const bx = p2.x - Math.cos(ang)*LEN, by = p2.y - Math.sin(ang)*LEN;
+    const nx = -Math.sin(ang), ny = Math.cos(ang);
+    const toLL = (x,y)=> map.containerPointToLatLng(L.point(x,y));
+    const tri = L.polygon([
+      toLL(p2.x, p2.y),
+      toLL(bx + nx*HALF, by + ny*HALF),
+      toLL(bx - nx*HALF, by - ny*HALF)
+    ], { color:f.color, weight:1, opacity:1, fillColor:f.color, fillOpacity:1, interactive:false }).addTo(map);
+    arrows.push(tri);
+  });
+}
+map.on('zoomend', drawArrows);
+
+function drawMap(){
+  markers.forEach(m=>map.removeLayer(m)); markers=[];
+  lines.forEach(l=>map.removeLayer(l)); lines=[];
+  arrows.forEach(m=>map.removeLayer(m)); arrows=[];
+  if(hubHalo){ map.removeLayer(hubHalo); hubHalo=null; }
+  if(hubTag){ map.removeLayer(hubTag); hubTag=null; }
+  flows=[];
+
+  const hub = findHub();
+  const note = document.getElementById('hubNote');
+
+  if(hub){
+    const h = C[hub.c], hp = pos(hub);
+    note.innerHTML = `중심 공장은 <b style="color:var(--s3)">${h.name}</b> 입니다. 아이디어와 재료가 이곳으로 모여 완제품이 되고, 다시 전 세계로 퍼져 나갑니다.`;
+
+    hubHalo = L.circleMarker(hp, { radius:20, color:'#DC2626', weight:1.5, opacity:.55,
+      fillColor:'#DC2626', fillOpacity:.10, interactive:false }).addTo(map);
+    hubTag = L.marker(hp, { interactive:false, keyboard:false,
+      icon:L.divIcon({ className:'', iconSize:[0,0], iconAnchor:[-16,4],
+        html:`<span class="hublabel" style="background:#fff;border:1px solid #DC2626;color:#DC2626">중심 공장</span>` }) }).addTo(map);
+
+    state.picked.forEach(r=>{
+      if(r === hub) return;
+      const from = pos(r); if(!from) return;
+      const inbound = (r.s <= 3);
+      const pts = inbound ? curvePts(from, hp) : curvePts(hp, from);
+      const color = inbound ? STEP_COLOR[r.s] : STEP_COLOR[4];
+      lines.push(L.polyline(pts, { color, weight:2.2, opacity:.75, dashArray: inbound ? '6 5' : null }).addTo(map));
+      flows.push({ pts, color });
+    });
+  }else{
+    note.textContent = '3단계(부품 만들고 연결하기) 국가를 선택하면, 그 나라가 중심 공장이 되어 화살표가 모입니다.';
+  }
+
+  state.picked.forEach(r=>{
+    const c = C[r.c]; if(!c) return;
+    const p = pos(r);
+    const isHub = hub && r === hub;
+    const icon = L.divIcon({ className:'',
+      iconSize: isHub?[34,34]:[26,26], iconAnchor: isHub?[17,33]:[13,25],
+      html:`<div class="pin ${isHub?'hub':''}" style="background:${STEP_COLOR[r.s]}"><i>${isHub?'★':r.s}</i></div>` });
+    const m = L.marker(p, {icon}).addTo(map);
+    m.bindPopup(`<b>${c.name}</b><br>${STEP_LABEL[r.s]}<br>${r.job}${isHub?'<br><b style="color:#DC2626">중심 공장</b>':''}`);
+    markers.push(m);
+  });
+
+  drawArrows();
+  drawGroups();
+  renderTrack();
+  fillCountrySelect();
+  save();
+}
+
+function drawGroups(){
+  const boxes = [
+    document.getElementById('groups'),    // STEP 2 : 삭제 버튼 있음
+    document.getElementById('q1Groups'),  // STEP 3 Q1 : 읽기 전용
+    document.getElementById('rGroups')    // STEP 4 보고서 : 읽기 전용
+  ];
+  const hub = findHub();
+  boxes.forEach((box, bi)=>{
+    if(!box) return;
+    box.innerHTML = '';
+    [1,2,3,4].forEach(s=>{
+      const grp = document.createElement('div');
+      grp.className = 'grp';
+      grp.style.borderLeftColor = STEP_COLOR[s];
+      grp.innerHTML = `<h4 style="color:${STEP_COLOR[s]}">${STEP_LABEL[s]}</h4>`;
+      const items = document.createElement('div');
+      items.className = 'items';
+      const list = state.picked.map((r,i)=>({r,i})).filter(o=>o.r.s===s);
+      if(list.length === 0){
+        items.innerHTML = '<span class="empty">-</span>';
+      }else{
+        list.forEach(({r,i})=>{
+          const isHub = hub && r === hub;
+          const el = document.createElement('span');
+          el.className = 'chip';
+          el.style.background = STEP_COLOR[s];
+          el.textContent = (isHub?'★ ':'') + C[r.c].name + ' · ' + r.job;
+          if(bi === 0){
+            const x = document.createElement('button');
+            x.type='button'; x.textContent='×'; x.setAttribute('aria-label','삭제');
+            x.addEventListener('click', ()=>{ state.picked.splice(i,1); drawMap(); });
+            el.appendChild(x);
+          }
+          items.appendChild(el);
+        });
+      }
+      grp.appendChild(items);
+      box.appendChild(grp);
+    });
+  });
+}
+
+/* 국가 등록 : 순서 검사를 통과해야만 핀이 찍힘 */
+document.getElementById('countrySel').addEventListener('change', e=>{
+  const v = e.target.value; e.target.value='';
+  if(v === '') return;
+
+  if(state.product === 'custom'){
+    const s = +document.getElementById('stepSel').value;
+    if(!checkOrder(s)) return;
+    if(state.picked.some(r=>r.c===v && r.s===s)) return;
+    state.picked.push({ c:v, s, job:STEP_SHORT[s] });
+  }else{
+    const r = PRODUCTS[state.product].routes[+v];
+    if(!checkOrder(r.s)) return;
+    if(state.picked.some(x=>x.c===r.c && x.job===r.job)) return;
+    state.picked.push({...r});
+  }
+  drawMap();
+});
+
+/* 초기화 : 핀과 함께 입력 순서도 1단계부터 다시 시작 */
+document.getElementById('btnReset').addEventListener('click', ()=>{
+  state.picked = [];
+  drawMap();
+  alert('지도를 초기화했습니다. 다시 1단계(아이디어 내기)부터 순서대로 입력해 주세요!');
+});
+
+/* =====================================================
+   단계 이동 (★ 지도 완성 전에는 Step 3·4로 이동 불가)
+   ===================================================== */
+const mapEl = document.getElementById('map');
+function goStep(n){
+  if(n >= 2 && !state.product){ alert('먼저 탐구할 상품을 선택해 주세요.'); return; }
+
+  if(n >= 3 && !mapComplete()){
+    if(state.product === 'custom'){
+      const rest = remainingItems();
+      alert(`아직 채우지 않은 단계가 있어요.\n\n남은 단계 : ${rest.map(s=>STEP_FULL[s]).join(', ')}\n\n네 단계를 모두 표시해야 다음으로 넘어갈 수 있습니다.`);
+    }else{
+      const rest = remainingItems();
+      alert(`아직 지도에 표시하지 않은 나라가 ${rest.length}곳 있어요.\n\n목록에 있는 나라를 모두 순서대로 표시해야 다음 단계로 넘어갈 수 있습니다.`);
+    }
+    goStep(2);
+    return;
+  }
+
+  // 지도는 한 개뿐이므로, 지금 보고 있는 화면으로 옮겨 준다
+  const slot = n === 4 ? 'reportMapSlot' : (n === 3 ? 'q1MapSlot' : 'mapHost');
+  document.getElementById(slot).appendChild(mapEl);
+
+  state.step = n;
+  for(let i=1;i<=4;i++) document.getElementById('panel'+i).classList.toggle('on', i===n);
+  document.querySelectorAll('.pstep').forEach(b=>{
+    const s = +b.dataset.go;
+    b.classList.toggle('active', s===n);
+    b.classList.toggle('done', s<n);
+  });
+  if(n === 4) buildReport();
+  setTimeout(()=>{ map.invalidateSize(); map.setView([26,25], 2); drawArrows(); }, 80);
+  window.scrollTo({top:0, behavior:'smooth'});
+  save();
+}
+document.querySelectorAll('[data-next]').forEach(b=> b.addEventListener('click', ()=> goStep(+b.dataset.next)));
+document.querySelectorAll('.pstep').forEach(b=> b.addEventListener('click', ()=> goStep(+b.dataset.go)));
+
+/* =====================================================
+   Q2 자료 : 상품별 '값이 어디로 가는지' (교육용 단순화 수치)
+   ===================================================== */
+const COSTS = {
+  jeans:{
+    title:'10만 원짜리 청바지 한 벌, 그 값은 어디로 갈까?',
+    rows:[
+      {l:'재료 구하기', sub:'목화·염료', pct:12, won:'12,000원', s:2},
+      {l:'봉제 공장에서 만들기', sub:'바느질하는 사람 임금', pct:2, won:'2,000원', s:3},
+      {l:'공장 운영비', sub:'기계·전기·공장 몫', pct:9, won:'9,000원', s:3},
+      {l:'운송과 세금', sub:'배·비행기', pct:6, won:'6,000원', s:4},
+      {l:'디자인·브랜드·광고', sub:'브랜드 회사 몫', pct:25, won:'25,000원', s:1},
+      {l:'가게에서 팔기', sub:'매장 몫', pct:46, won:'46,000원', s:4}
+    ],
+    ask:[
+      '청바지를 직접 바느질해 만드는 데 쓰이는 돈(임금 + 운영비)은 모두 얼마인가요?',
+      '그 금액을 ‘디자인·브랜드·광고’ 한 칸과 비교하면 어느 쪽이 큰가요?',
+      '목화를 키운 베냉과 디자인을 한 나라 중, 어느 쪽이 더 많이 가져갔나요?'
+    ],
+    sample:'아이디어를 내는 단계가 더 많은 이익을 가져간다고 생각한다. 청바지를 직접 바느질해 만드는 데 들어가는 돈은 임금 2%와 공장 운영비 9%를 합쳐 11%인데, 디자인과 광고를 맡은 브랜드 회사는 혼자서 25%를 가져가기 때문이다. 바느질은 기계와 사람이 있으면 다른 나라에서도 할 수 있어서 공장끼리 더 싸게 만들겠다고 경쟁하지만, 그 브랜드의 디자인과 이름은 그 회사만 가지고 있어서 값을 스스로 정할 수 있다.'
+  },
+  tumbler:{
+    title:'5만 원짜리 텀블러 하나, 그 값은 어디로 갈까?',
+    rows:[
+      {l:'재료 구하기', sub:'철광석·크로뮴', pct:16, won:'8,000원', s:2},
+      {l:'공장에서 만들기', sub:'일하는 사람 임금', pct:3, won:'1,500원', s:3},
+      {l:'공장 운영비', sub:'기계·전기·공장 몫', pct:11, won:'5,500원', s:3},
+      {l:'운송과 세금', sub:'배·비행기', pct:7, won:'3,500원', s:4},
+      {l:'디자인·브랜드·광고', sub:'브랜드 회사 몫', pct:28, won:'14,000원', s:1},
+      {l:'가게에서 팔기', sub:'매장·온라인 몫', pct:35, won:'17,500원', s:4}
+    ],
+    ask:[
+      '텀블러를 직접 만드는 데 쓰이는 돈(임금 + 운영비)은 모두 얼마인가요?',
+      '그 금액을 ‘디자인·브랜드·광고’ 한 칸과 비교하면 어느 쪽이 큰가요?',
+      '금속을 캐낸 나라의 몫은 왜 이렇게 작을지 생각해 보세요.'
+    ],
+    sample:'아이디어를 내는 단계가 더 많은 이익을 가져간다고 생각한다. 텀블러를 직접 만드는 데 들어가는 돈은 임금 3%와 공장 운영비 11%를 합쳐 14%인데, 디자인과 광고를 맡은 브랜드 회사는 28%를 가져가기 때문이다. 스테인리스 물병을 만드는 공장은 여러 나라에 많아서 서로 더 싸게 만들겠다고 경쟁하지만, 사람들이 그 브랜드의 이름을 보고 사기 때문에 브랜드 회사는 값을 높게 정할 수 있다.'
+  },
+  phone:{
+    title:'150만 원짜리 스마트폰 한 대, 그 값은 어디로 갈까?',
+    rows:[
+      {l:'재료 구하기', sub:'코발트·리튬 등 광물', pct:3, won:'45,000원', s:2},
+      {l:'부품 만들기', sub:'반도체·화면·카메라', pct:35, won:'525,000원', s:3},
+      {l:'조립 공장에서 만들기', sub:'조립하는 사람 임금', pct:2, won:'30,000원', s:3},
+      {l:'운송과 세금', sub:'비행기·배', pct:5, won:'75,000원', s:4},
+      {l:'설계·소프트웨어·브랜드', sub:'본사 몫', pct:35, won:'525,000원', s:1},
+      {l:'가게에서 팔기', sub:'매장·통신사 몫', pct:20, won:'300,000원', s:4}
+    ],
+    ask:[
+      '광물을 캔 나라와 조립한 나라의 몫을 합치면 몇 %인가요?',
+      '그 금액을 ‘설계·소프트웨어·브랜드’ 한 칸과 비교하면 어느 쪽이 큰가요?',
+      '부품 만들기(35%)는 왜 조립(2%)보다 훨씬 클까요? 두 일의 차이를 생각해 보세요.'
+    ],
+    sample:'아이디어를 내는 단계가 더 많은 이익을 가져간다고 생각한다. 광물을 캐는 일(3%)과 조립하는 사람의 임금(2%)을 합쳐도 5%뿐인데, 설계와 소프트웨어를 맡은 본사는 혼자서 35%를 가져가기 때문이다. 다만 반도체와 화면 같은 부품도 35%나 되는데, 이런 부품은 아무 나라나 만들 수 없는 어려운 기술이 필요하기 때문인 것 같다. 결국 남이 따라 하기 어려운 일을 맡은 나라가 더 많은 이익을 가져간다.'
+  },
+  shoes:{
+    title:'10만 원짜리 운동화 한 켤레, 그 값은 어디로 갈까?',
+    rows:[
+      {l:'재료 구하기', sub:'고무·섬유', pct:12, won:'12,000원', s:2},
+      {l:'공장에서 만들기', sub:'일하는 사람 임금', pct:3, won:'3,000원', s:3},
+      {l:'공장 운영비', sub:'기계·전기·공장 몫', pct:8, won:'8,000원', s:3},
+      {l:'운송과 세금', sub:'배·비행기', pct:5, won:'5,000원', s:4},
+      {l:'아이디어·디자인·광고', sub:'브랜드 회사 몫', pct:30, won:'30,000원', s:1},
+      {l:'가게에서 팔기', sub:'매장 몫', pct:42, won:'42,000원', s:4}
+    ],
+    ask:[
+      '운동화를 직접 만드는 데 쓰이는 돈(임금 + 운영비)은 모두 얼마인가요?',
+      '그 금액을 ‘아이디어·디자인·광고’ 한 칸과 비교하면 어느 쪽이 큰가요?',
+      '왜 그런 차이가 생겼을지 이유를 두 가지만 떠올려 보세요.'
+    ],
+    sample:'아이디어를 내는 단계가 더 많은 이익을 가져간다고 생각한다. 공장에서 직접 만드는 데 들어가는 돈은 임금 3%와 운영비 8%를 합쳐 11% 정도인데, 디자인과 광고를 맡은 브랜드 회사는 혼자서 30%를 가져가기 때문이다. 신발을 꿰매는 일은 다른 나라 공장도 할 수 있어서 서로 더 싸게 만들겠다고 경쟁하지만, 그 브랜드의 디자인과 이름은 그 회사만 가지고 있어서 값을 스스로 정할 수 있다.'
+  }
+};
+COSTS.custom = Object.assign({}, COSTS.shoes, {
+  title:'참고 자료 · 10만 원짜리 운동화 한 켤레, 그 값은 어디로 갈까?'
+});
+
+function renderCost(){
+  const d = COSTS[state.product] || COSTS.shoes;
+  document.getElementById('dcTitle').textContent = '자료 · ' + d.title;
+  document.getElementById('dcNote').textContent = state.product === 'custom'
+    ? '내가 고른 상품의 자료가 없으니, 운동화를 예로 살펴봅시다. 교육용으로 단순하게 만든 자료입니다.'
+    : '교육용으로 단순하게 만든 예시 자료입니다.';
+
+  document.getElementById('dcBars').innerHTML = d.rows.map(r=>
+    `<div class="bar-row">
+       <span class="bl">${r.l}<br><i>${r.sub}</i></span>
+       <span class="track"><i style="width:${r.pct}%;background:${STEP_COLOR[r.s]}"></i></span>
+       <b>${r.pct}%</b><em>${r.won}</em>
+     </div>`).join('');
+
+  document.getElementById('dcAsk').innerHTML = d.ask.map(q=>`<li>${q}</li>`).join('');
+  document.getElementById('peekText').textContent = d.sample;
+
+  // 상품이 바뀌면 예시는 다시 닫아 둔다
+  const box = document.getElementById('peekQ2');
+  const btn = document.querySelector('[data-peek="peekQ2"]');
+  box.setAttribute('hidden','');
+  btn.setAttribute('aria-expanded','false');
+  btn.textContent = '💡 예시 살짝 보기';
+}
+
+/* 예시 살짝 보기 : 누르면 열리고, 다시 누르면 닫힘 */
+document.querySelectorAll('.peek-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const box = document.getElementById(btn.dataset.peek);
+    const open = box.hasAttribute('hidden');
+    if(open) box.removeAttribute('hidden'); else box.setAttribute('hidden','');
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    btn.textContent = open ? '💡 예시 닫기' : '💡 예시 살짝 보기';
+  });
+});
+
+/* Q1 참고 영역의 지도 접기 / 펼치기 */
+document.getElementById('rcToggle').addEventListener('click', ()=>{
+  const box = document.getElementById('recall');
+  const hidden = box.classList.toggle('hide-map');
+  document.getElementById('rcToggle').textContent = hidden ? '지도 펼치기' : '지도 접기';
+  if(!hidden) setTimeout(()=>{ map.invalidateSize(); drawArrows(); }, 60);
+});
+
+/* =====================================================
+   보고서
+   ===================================================== */
+const V = id => document.getElementById(id).value.trim();
+function buildReport(){
+  document.getElementById('rSchool').textContent = V('school') || '-';
+  document.getElementById('rClass').textContent  = V('classno') || '-';
+  document.getElementById('rName').textContent   = V('student') || '-';
+  document.getElementById('rFootName').textContent = (V('classno')? V('classno')+' ':'') + (V('student')||'');
+  const d = new Date();
+  document.getElementById('rDate').textContent = `${d.getFullYear()}. ${d.getMonth()+1}. ${d.getDate()}.`;
+
+  const p = PRODUCTS[state.product];
+  if(state.product === 'custom'){
+    document.getElementById('rProd').textContent = V('customName') || '직접 고른 상품';
+    document.getElementById('rProdDesc').textContent = '라벨에서 확인한 원산지 : ' + (V('customOrigin') || '(미입력)');
+  }else if(p){
+    document.getElementById('rProd').textContent = `${p.icon} ${p.label}`;
+    document.getElementById('rProdDesc').textContent = p.desc;
+  }
+  ['q1','q2','q3'].forEach(id=>{
+    document.getElementById('r'+id.toUpperCase()).textContent = V(id) || '(작성하지 않음)';
+  });
+  drawGroups();
+}
+
+/* =====================================================
+   임시 저장
+   ===================================================== */
+const KEY = 'worldtrade-worksheet-v4';
+const fields = Array.from(document.querySelectorAll('[data-save]'));
+const saveState = document.getElementById('saveState');
+let storageOK = true;
+
+function save(){
+  if(!storageOK) return;
+  const data = { product:state.product, picked:state.picked, step:state.step };
+  fields.forEach(f => data[f.id] = f.value);
+  try{
+    localStorage.setItem(KEY, JSON.stringify(data));
+    saveState.textContent = '작성 내용이 자동 저장되었습니다.';
+  }catch(e){
+    storageOK = false;
+    saveState.textContent = '이 화면에서는 자동 저장이 제한됩니다. 파일을 내려받아 열면 저장됩니다.';
+  }
+}
+function load(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    saveState.textContent = '자동 저장이 켜져 있습니다.';
+    if(!raw) return;
+    const d = JSON.parse(raw);
+    fields.forEach(f=>{ if(typeof d[f.id]==='string') f.value = d[f.id]; });
+    if(Array.isArray(d.picked)) state.picked = d.picked;
+    if(d.product && PRODUCTS[d.product]) selectProduct(d.product, false);
+  }catch(e){
+    storageOK = false;
+    saveState.textContent = '이 화면에서는 자동 저장이 제한됩니다. 파일을 내려받아 열면 저장됩니다.';
+  }
+}
+let t = null;
+fields.forEach(f=> f.addEventListener('input', ()=>{
+  clearTimeout(t); t = setTimeout(save, 400);
+  const c = document.querySelector(`[data-count="${f.id}"]`);
+  if(c) c.textContent = f.value.length + '자';
+}));
+
+load();
+drawMap();
+renderCost();
+document.querySelectorAll('[data-count]').forEach(c=>{
+  const f = document.getElementById(c.dataset.count);
+  if(f) c.textContent = f.value.length + '자';
+});
+
+/* =====================================================
+   PDF / PNG 저장
+   ===================================================== */
+const statusEl = document.getElementById('status');
+const btnPdf = document.getElementById('btnPdf');
+const btnPng = document.getElementById('btnPng');
+
+function fileBase(){
+  const clean = s => s.replace(/[\\/:*?"<>|]/g,'').trim();
+  return `세계화_탐구보고서_${clean(V('classno')) || '학년반'}_${clean(V('student')) || '이름'}`;
+}
+
+const CANVAS_OPTS = {
+  scale:2, useCORS:true, allowTaint:true,
+  backgroundColor:'#FFFFFF', scrollX:0, scrollY:-window.scrollY, windowWidth:1200
+};
+
+async function capture(){
+  buildReport();
+  map.invalidateSize();
+  drawArrows();
+  await new Promise(r=>setTimeout(r, 1100));   // 지도 타일 로딩 대기
+
+  // 혹시 SVG로 그려진 요소가 남아 있으면 크기 속성을 채워 준다 (html2canvas 대비)
+  document.querySelectorAll('#map svg').forEach(svg=>{
+    const r = svg.getBoundingClientRect();
+    if(r.width && r.height){
+      svg.setAttribute('width', Math.round(r.width));
+      svg.setAttribute('height', Math.round(r.height));
+    }
+  });
+
+  return await html2canvas(document.getElementById('report'), CANVAS_OPTS);
+}
+
+btnPdf.addEventListener('click', async ()=>{
+  btnPdf.disabled = btnPng.disabled = true;
+  statusEl.textContent = 'PDF를 만드는 중입니다…';
+  try{
+    const canvas = await capture();
+    const jsPDFCtor = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+    if(jsPDFCtor){
+      const pdf = new jsPDFCtor({unit:'mm', format:'a4', orientation:'portrait'});
+      const pw=210, ph=297, m=8;
+      const ratio = Math.min((pw-m*2)/canvas.width, (ph-m*2)/canvas.height);
+      const w = canvas.width*ratio, h = canvas.height*ratio;
+      pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', (pw-w)/2, m, w, h);
+      pdf.save(fileBase()+'.pdf');
+    }else{
+      await html2pdf().set({
+        margin:8, filename:fileBase()+'.pdf',
+        image:{type:'jpeg', quality:0.95},
+        html2canvas:CANVAS_OPTS,
+        jsPDF:{unit:'mm', format:'a4', orientation:'portrait'}
+      }).from(document.getElementById('report')).save();
+    }
+    statusEl.textContent = 'PDF 저장이 완료되었습니다.';
+  }catch(err){
+    console.error(err);
+    statusEl.textContent = '저장에 실패했습니다. 잠시 후 다시 시도해 주세요.';
+  }finally{ btnPdf.disabled = btnPng.disabled = false; }
+});
+
+btnPng.addEventListener('click', async ()=>{
+  btnPdf.disabled = btnPng.disabled = true;
+  statusEl.textContent = 'PNG 이미지를 만드는 중입니다…';
+  try{
+    const canvas = await capture();
+    const a = document.createElement('a');
+    a.download = fileBase()+'.png';
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+    statusEl.textContent = 'PNG 저장이 완료되었습니다.';
+  }catch(err){
+    console.error(err);
+    statusEl.textContent = '저장에 실패했습니다. 잠시 후 다시 시도해 주세요.';
+  }finally{ btnPdf.disabled = btnPng.disabled = false; }
+});
+</script>
+</body>
+</html>
