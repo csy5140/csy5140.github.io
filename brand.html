@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>우리 동네 브랜드 &amp; 기념품 만들기 · 중1 사회</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FFFBF2;
+  --ink:#33475B;
+  --ink-soft:#6B7C8F;
+  --lilac:#B7A6EC;
+  --lilac-deep:#7B62CF;
+  --mint:#6FD4BC;
+  --mint-deep:#25A88C;
+  --coral:#FF8674;
+  --coral-deep:#E85F4A;
+  --lemon:#FFD84D;
+  --line:#DCD3C4;
+}
+*{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  margin:0; padding:22px 14px 60px;
+  background:
+    radial-gradient(circle at 10% 6%, #F1EBFF 0, transparent 42%),
+    radial-gradient(circle at 90% 94%, #E3F7F1 0, transparent 45%),
+    #FDF6E9;
+  font-family:'Gowun Dodum','Apple SD Gothic Neo',sans-serif;
+  color:var(--ink); line-height:1.7;
+}
+
+.page{
+  width:210mm; max-width:100%;
+  margin:0 auto 28px;
+  padding:15mm 14mm 12mm;
+  background:var(--paper);
+  border-radius:14px;
+  box-shadow:0 14px 34px rgba(120,100,70,.16);
+  position:relative;
+}
+.page::before{
+  content:""; position:absolute; top:-11px; left:50%;
+  width:118px; height:26px; transform:translateX(-50%) rotate(-1.6deg);
+  background:repeating-linear-gradient(45deg,#E4D9FF 0 7px,#D3C3F7 7px 14px);
+  border-radius:2px;
+}
+
+/* ── 상단 툴바 ── */
+.toolbar{
+  width:210mm; max-width:100%; margin:0 auto 16px;
+  display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+  font-size:13.5px; color:var(--ink-soft);
+}
+.btn{
+  font-family:'Jua',sans-serif; font-size:15px;
+  border:2px solid var(--ink); border-radius:999px;
+  background:var(--lemon); color:var(--ink);
+  padding:8px 20px; cursor:pointer; box-shadow:3px 3px 0 var(--ink);
+}
+.btn.ghost{background:#fff;}
+.btn:hover{filter:brightness(.97);}
+.btn:active{transform:translate(3px,3px); box-shadow:none;}
+.btn:disabled{opacity:.5; cursor:progress;}
+.btn:focus-visible{outline:3px solid var(--coral); outline-offset:3px;}
+input:focus-visible, textarea:focus-visible, button:focus-visible{outline:2px solid var(--coral); outline-offset:2px;}
+
+/* ── 머리 ── */
+.mission-head{display:flex; align-items:center; gap:14px;}
+.badge{
+  width:56px; height:56px; flex:none; border-radius:50%;
+  background:var(--lilac); color:#fff;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  font-family:'Jua',sans-serif; line-height:1.05; box-shadow:0 5px 0 rgba(0,0,0,.13);
+}
+.badge small{font-size:10px; opacity:.92;}
+.badge b{font-size:24px; font-weight:400;}
+.mission-head h1{font-family:'Jua',sans-serif; font-size:clamp(23px,4.6vw,30px); margin:0;}
+.mission-head p{margin:2px 0 0; font-size:14px; color:var(--ink-soft);}
+.rule{height:4px; border-radius:4px; margin:12px 0 16px; background:linear-gradient(90deg,var(--lilac),#E6DFFA);}
+
+.namebar{
+  display:flex; gap:8px; flex-wrap:wrap;
+  background:#fff; border:2px solid var(--line); border-radius:12px;
+  padding:8px 13px; margin-bottom:16px;
+}
+.namebar label{display:flex; align-items:center; gap:6px; font-size:13.5px; color:var(--ink-soft); flex:1 1 88px;}
+.namebar input{
+  flex:1; min-width:0; border:0; border-bottom:1.5px dashed var(--line);
+  background:transparent; font-family:'Gaegu',cursive; font-size:18px;
+  color:var(--lilac-deep); padding:2px 4px;
+}
+.namebar input:focus{outline:none; border-bottom-color:var(--lilac);}
+
+/* ── 슬로건 ── */
+.slogan{border:3px solid var(--lilac); border-radius:16px; background:#fff; padding:13px 16px; margin-bottom:14px;}
+.slogan label{font-family:'Jua',sans-serif; font-size:14.5px; color:var(--lilac-deep);}
+.slogan input{
+  width:100%; border:0; border-bottom:2px dashed #E0D8F6; background:transparent;
+  font-family:'Jua',sans-serif; font-size:clamp(19px,3.6vw,25px); color:var(--ink);
+  padding:8px 2px 6px; margin-top:5px;
+}
+.slogan input:focus{outline:none; border-bottom-color:var(--lilac);}
+.slogan .tip{font-family:'Gaegu',cursive; font-size:15px; color:var(--ink-soft);}
+
+/* ── 입력 필드 ── */
+.field{margin-bottom:11px;}
+.field > label{display:inline-block; font-family:'Jua',sans-serif; font-size:14.5px; margin-bottom:5px;}
+.field .tip{font-family:'Gaegu',cursive; font-size:15px; color:var(--ink-soft); margin-left:6px;}
+.field input[type="text"], .field textarea{
+  width:100%; border:2px solid var(--line); border-radius:10px; background:#fff;
+  padding:8px 11px; font-family:'Gowun Dodum',sans-serif; font-size:14.5px; color:var(--ink); resize:none;
+}
+.field input[type="text"]:focus, .field textarea:focus{outline:none; border-color:var(--lilac); background:#FEFCFF;}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px 14px;}
+.grid-logo{display:grid; grid-template-columns:1.25fr 1fr; gap:16px; align-items:start;}
+
+/* ── 그리기 도구 막대 ── */
+.drawbar{
+  display:flex; align-items:center; gap:6px; flex-wrap:wrap;
+  background:#F5F0FF; border:2px solid var(--lilac); border-radius:12px;
+  padding:7px 10px; margin-bottom:8px;
+}
+.drawbar .sep{width:1px; height:22px; background:#D8CCF5; margin:0 3px;}
+.swatch{
+  width:24px; height:24px; border-radius:50%; border:2px solid #fff;
+  box-shadow:0 0 0 1.5px #C9BFAE; cursor:pointer; padding:0;
+}
+.swatch[aria-pressed="true"]{box-shadow:0 0 0 3px var(--ink); transform:scale(1.12);}
+.tool{
+  font-family:'Gowun Dodum',sans-serif; font-size:13px; color:var(--ink);
+  background:#fff; border:2px solid #D8CCF5; border-radius:9px;
+  padding:4px 10px; cursor:pointer;
+}
+.tool[aria-pressed="true"]{background:var(--lilac); color:#fff; border-color:var(--lilac-deep);}
+.tool.wide{padding:4px 12px;}
+.sizedot{display:inline-block; border-radius:50%; background:currentColor; vertical-align:middle;}
+input[type="color"]{width:34px; height:26px; border:2px solid #D8CCF5; border-radius:8px; background:#fff; padding:1px; cursor:pointer;}
+.filelabel{
+  font-family:'Gowun Dodum',sans-serif; font-size:13px;
+  background:#fff; border:2px solid #D8CCF5; border-radius:9px; padding:4px 10px; cursor:pointer;
+}
+.filelabel:hover{background:#FBF8FF;}
+.drawbar input[type="file"]{position:absolute; width:1px; height:1px; opacity:0; pointer-events:none;}
+
+/* ── 캔버스 ── */
+.canvas-wrap{
+  position:relative; border:3px dashed var(--line); border-radius:14px;
+  background-color:#fff;
+  background-image:linear-gradient(#F4F0E6 1px,transparent 1px),linear-gradient(90deg,#F4F0E6 1px,transparent 1px);
+  background-size:16px 16px;
+  overflow:hidden;
+}
+.canvas-wrap .bgimg{
+  position:absolute; inset:0; width:100%; height:100%;
+  object-fit:contain; opacity:.85; display:none;
+}
+.canvas-wrap canvas{position:relative; display:block; width:100%; height:100%; touch-action:none; cursor:crosshair;}
+.canvas-wrap .ph{
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  font-family:'Gaegu',cursive; font-size:16px; color:#C9BFAE; text-align:center; pointer-events:none;
+}
+.canvas-wrap.dirty .ph{display:none;}
+.logo-box{height:96mm;}
+.goods-box{height:52mm;}
+.guide{position:absolute; inset:0; width:100%; height:100%; pointer-events:none;}
+
+.draw-cap{font-family:'Jua',sans-serif; font-size:14px; margin:0 0 6px;}
+.draw-cap b{font-weight:400; color:var(--lilac-deep);}
+
+/* ── 기념품 ── */
+.goods{display:grid; grid-template-columns:repeat(2,1fr); gap:12px 14px;}
+.good{background:#fff; border:2px solid var(--line); border-radius:14px; padding:10px 11px 12px;}
+.good h3{font-family:'Jua',sans-serif; font-size:15px; margin:0 0 2px;}
+.good .why{font-size:12.5px; color:var(--ink-soft); margin:0 0 7px; line-height:1.5;}
+.good:nth-child(1){box-shadow:4px 4px 0 var(--coral);}
+.good:nth-child(2){box-shadow:4px 4px 0 var(--mint);}
+.good:nth-child(3){box-shadow:4px 4px 0 var(--lemon);}
+.good:nth-child(4){box-shadow:4px 4px 0 var(--lilac);}
+
+/* ── 참고 예시 ── */
+.refs{background:#F5F0FF; border:2px dashed var(--lilac-deep); border-radius:16px; padding:14px 16px 16px; margin-top:16px;}
+.refs h2{font-family:'Jua',sans-serif; font-size:19px; margin:0 0 3px; color:var(--lilac-deep);}
+.refs .lead{font-family:'Gaegu',cursive; font-size:16px; color:var(--ink-soft); margin:0 0 11px;}
+.refgrid{display:grid; grid-template-columns:repeat(3,1fr); gap:9px;}
+.ref{background:#fff; border-radius:11px; padding:9px 11px 10px; border:1.5px solid #E2D9F7;}
+.ref b{font-family:'Jua',sans-serif; font-size:14px; font-weight:400; display:block; color:var(--ink);}
+.ref .city{font-size:11.5px; color:var(--lilac-deep); display:block; margin-bottom:3px;}
+.ref p{margin:0; font-size:12.5px; color:var(--ink-soft); line-height:1.55;}
+
+.refslot{
+  margin-top:11px; border:2px solid #E2D9F7; border-radius:12px; background:#fff;
+  min-height:64px; display:flex; align-items:center; justify-content:center; padding:8px; position:relative;
+}
+.refslot img{max-width:100%; display:none; border-radius:6px;}
+.refslot.filled img{display:block;}
+.refslot .slotmsg{font-family:'Gaegu',cursive; font-size:15px; color:#B9AFD6; text-align:center;}
+.refslot.filled .slotmsg{display:none;}
+
+/* ── 마무리 ── */
+.wrapup{border:2px solid var(--ink); border-radius:16px; padding:14px 17px; background:#FFFDF4; box-shadow:5px 5px 0 var(--lemon); margin-top:16px;}
+.wrapup h2{font-family:'Jua',sans-serif; font-size:18px; margin:0 0 9px;}
+
+.pagenum{text-align:right; font-family:'Gaegu',cursive; font-size:15px; color:#C9BFAE; margin-top:12px;}
+.hint-line{font-family:'Gaegu',cursive; font-size:15px; color:var(--ink-soft); margin:0 0 10px;}
+
+/* ── 반응형 ── */
+@media (max-width:760px){
+  body{padding:14px 9px 40px;}
+  .page{padding:20px 16px 16px;}
+  .grid-logo,.grid2,.goods{grid-template-columns:1fr;}
+  .refgrid{grid-template-columns:1fr;}
+  .logo-box{height:280px;}
+  .goods-box{height:190px;}
+}
+
+/* ── 인쇄 / PDF ── */
+@page{size:A4; margin:11mm;}
+@media print{
+  body{background:#fff; padding:0; margin:0; -webkit-print-color-adjust:exact; print-color-adjust:exact;}
+  .toolbar,.drawbar,.no-print{display:none !important;}
+  .page{width:auto; margin:0; padding:0; box-shadow:none; border-radius:0; background:#fff; page-break-after:always; break-after:page;}
+  .page::before{display:none;}
+  .page:last-of-type{page-break-after:auto; break-after:auto;}
+  .page,.canvas-wrap,.good,.refs,.wrapup,.slogan{break-inside:avoid; page-break-inside:avoid;}
+  input,textarea{border-color:#B9B0A0 !important; background:#fff !important; color:#000 !important;}
+}
+body.exporting .toolbar,body.exporting .drawbar,body.exporting .no-print{display:none !important;}
+body.exporting .page{box-shadow:none;}
+body.exporting .page::before{display:none;}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <button class="btn" id="pdfBtn">A4 PDF로 저장</button>
+  <button class="btn ghost" onclick="window.print()">인쇄하기</button>
+  <span id="status">로고와 기념품 칸은 화면에서 바로 그릴 수 있어요. (2쪽)</span>
+</div>
+
+<!-- ════════ 1쪽 : 브랜드 만들기 ════════ -->
+<section class="page">
+  <div class="mission-head">
+    <div class="badge"><small>MISSION</small><b>3</b></div>
+    <div>
+      <h1>우리 동네 브랜드 만들기</h1>
+      <p>지역 브랜드 · 로고 하나와 문장 하나로 동네를 기억시키기</p>
+    </div>
+  </div>
+  <div class="rule"></div>
+
+  <div class="namebar">
+    <label>학년 <input type="text"></label>
+    <label>반 <input type="text"></label>
+    <label>번호 <input type="text"></label>
+    <label>이름 <input type="text"></label>
+    <label>우리 동네 <input type="text" placeholder="예: 강원 횡성"></label>
+  </div>
+
+  <div class="slogan">
+    <label>우리 동네 슬로건</label>
+    <input type="text" placeholder="여기에 크게 써 보세요">
+    <span class="tip">짧게, 소리 내어 읽었을 때 리듬이 살아 있게. 10자 안팎이면 충분해요.</span>
+  </div>
+
+  <div class="grid-logo">
+    <div>
+      <p class="draw-cap">브랜드 로고 <b>— 명함에 넣어도 알아볼 크기로</b></p>
+
+      <div class="drawbar no-print" data-for="logo">
+        <button class="swatch" data-color="#33475B" style="background:#33475B" aria-pressed="true" title="먹색"></button>
+        <button class="swatch" data-color="#E85F4A" style="background:#E85F4A" aria-pressed="false" title="코랄"></button>
+        <button class="swatch" data-color="#25A88C" style="background:#25A88C" aria-pressed="false" title="민트"></button>
+        <button class="swatch" data-color="#7B62CF" style="background:#7B62CF" aria-pressed="false" title="라일락"></button>
+        <button class="swatch" data-color="#FFC629" style="background:#FFC629" aria-pressed="false" title="노랑"></button>
+        <input type="color" value="#FF8674" title="색 직접 고르기">
+        <span class="sep"></span>
+        <button class="tool" data-size="3" aria-pressed="false"><i class="sizedot" style="width:5px;height:5px"></i> 가늘게</button>
+        <button class="tool" data-size="7" aria-pressed="true"><i class="sizedot" style="width:8px;height:8px"></i> 보통</button>
+        <button class="tool" data-size="16" aria-pressed="false"><i class="sizedot" style="width:12px;height:12px"></i> 굵게</button>
+        <span class="sep"></span>
+        <button class="tool wide" data-mode="eraser" aria-pressed="false">지우개</button>
+        <button class="tool" data-act="undo">되돌리기</button>
+        <button class="tool" data-act="clear">전체 지우기</button>
+        <span class="sep"></span>
+        <label class="filelabel">사진 넣기<input type="file" accept="image/*" data-act="photo"></label>
+        <button class="tool" data-act="photo-clear">사진 빼기</button>
+      </div>
+
+      <div class="canvas-wrap logo-box" data-id="logo">
+        <img class="bgimg" alt="">
+        <canvas></canvas>
+        <div class="ph">여기에 로고를 그려요<br>사진을 넣고 그 위에 따라 그려도 좋아요</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="field">
+        <label>로고에 담은 뜻</label>
+        <textarea rows="4" placeholder="어떤 모양이 무엇을 상징하는지"></textarea>
+      </div>
+      <div class="field">
+        <label>대표 색 두 가지와 그 이유</label>
+        <textarea rows="3" placeholder="예: 민트 – 계곡물 / 노랑 – 사과밭"></textarea>
+      </div>
+      <div class="field">
+        <label>한 단어로 말하면 우리 동네는?</label>
+        <input type="text" placeholder="예: 서늘한, 부지런한, 달큰한">
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <label>이 브랜드를 어디에 붙일까요?</label>
+        <textarea rows="3" placeholder="버스, 쓰레기봉투, 축제 현수막, 시청 누리집…"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <p class="pagenum">1 / 2</p>
+</section>
+
+<!-- ════════ 2쪽 : 기념품 + 참고 예시 ════════ -->
+<section class="page">
+  <div class="mission-head">
+    <div class="badge" style="background:var(--coral)"><small>MISSION</small><b>3+</b></div>
+    <div>
+      <h1>브랜드로 기념품 만들기</h1>
+      <p>로고가 물건 위에 올라갈 때 브랜드는 비로소 팔리기 시작합니다</p>
+    </div>
+  </div>
+  <div class="rule" style="background:linear-gradient(90deg,var(--coral),#FFD1C8)"></div>
+
+  <p class="hint-line">앞에서 만든 로고와 슬로건을 네 가지 물건에 올려 보세요. 물건마다 어울리는 크기와 위치가 다릅니다.</p>
+
+  <div class="drawbar no-print" data-for="goods">
+    <button class="swatch" data-color="#33475B" style="background:#33475B" aria-pressed="true"></button>
+    <button class="swatch" data-color="#E85F4A" style="background:#E85F4A" aria-pressed="false"></button>
+    <button class="swatch" data-color="#25A88C" style="background:#25A88C" aria-pressed="false"></button>
+    <button class="swatch" data-color="#7B62CF" style="background:#7B62CF" aria-pressed="false"></button>
+    <button class="swatch" data-color="#FFC629" style="background:#FFC629" aria-pressed="false"></button>
+    <input type="color" value="#FF8674">
+    <span class="sep"></span>
+    <button class="tool" data-size="3" aria-pressed="false">가늘게</button>
+    <button class="tool" data-size="6" aria-pressed="true">보통</button>
+    <button class="tool" data-size="12" aria-pressed="false">굵게</button>
+    <span class="sep"></span>
+    <button class="tool wide" data-mode="eraser" aria-pressed="false">지우개</button>
+    <button class="tool" data-act="undo">되돌리기</button>
+    <button class="tool" data-act="clear">전체 지우기</button>
+    <span class="sep"></span>
+    <span style="font-size:12.5px;color:var(--ink-soft)">네 칸 모두 이 도구로 그려요</span>
+  </div>
+
+  <div class="goods">
+    <div class="good">
+      <h3>🪭 부채</h3>
+      <p class="why">여름 축제에서 나눠 주는 물건. 멀리서도 보이게 크고 단순하게.</p>
+      <div class="canvas-wrap goods-box" data-id="fan" data-group="goods">
+        <svg class="guide" viewBox="0 0 200 130" preserveAspectRatio="xMidYMid meet">
+          <path d="M100 108 L38 44 A88 88 0 0 1 162 44 Z" fill="none" stroke="#E3DCCE" stroke-width="2.5" stroke-dasharray="6 5"/>
+          <rect x="95" y="106" width="10" height="20" rx="4" fill="none" stroke="#E3DCCE" stroke-width="2.5" stroke-dasharray="6 5"/>
+        </svg>
+        <canvas></canvas>
+        <div class="ph">부채 면에 그려요</div>
+      </div>
+    </div>
+
+    <div class="good">
+      <h3>☕ 머그컵</h3>
+      <p class="why">매일 손에 쥐는 물건. 로고가 작아져도 알아볼 수 있어야 해요.</p>
+      <div class="canvas-wrap goods-box" data-id="mug" data-group="goods">
+        <svg class="guide" viewBox="0 0 200 130" preserveAspectRatio="xMidYMid meet">
+          <path d="M58 24 h74 v72 a12 12 0 0 1 -12 12 h-50 a12 12 0 0 1 -12 -12 Z" fill="none" stroke="#E3DCCE" stroke-width="2.5" stroke-dasharray="6 5"/>
+          <path d="M132 44 q28 0 28 20 t-28 20" fill="none" stroke="#E3DCCE" stroke-width="2.5" stroke-dasharray="6 5"/>
+        </svg>
+        <canvas></canvas>
+        <div class="ph">컵 몸통에 그려요</div>
+      </div>
+    </div>
+
+    <div class="good">
+      <h3>👕 티셔츠</h3>
+      <p class="why">사람이 입고 걸어 다니는 광고판. 가슴 한가운데가 명당.</p>
+      <div class="canvas-wrap goods-box" data-id="tee" data-group="goods">
+        <svg class="guide" viewBox="0 0 200 130" preserveAspectRatio="xMidYMid meet">
+          <path d="M76 16 L88 10 Q100 22 112 10 L124 16 L154 32 L140 52 L130 46 L130 120 L70 120 L70 46 L60 52 L46 32 Z" fill="none" stroke="#E3DCCE" stroke-width="2.5" stroke-dasharray="6 5"/>
+        </svg>
+        <canvas></canvas>
+        <div class="ph">앞면에 그려요</div>
+      </div>
+    </div>
+
+    <div class="good">
+      <h3>🔑 열쇠고리</h3>
+      <p class="why">가장 작은 굿즈. 복잡한 그림은 뭉개지니 형태를 줄여 보세요.</p>
+      <div class="canvas-wrap goods-box" data-id="key" data-group="goods">
+        <svg class="guide" viewBox="0 0 200 130" preserveAspectRatio="xMidYMid meet">
+          <circle cx="100" cy="22" r="12" fill="none" stroke="#E3DCCE" stroke-width="2.5" stroke-dasharray="6 5"/>
+          <rect x="56" y="42" width="88" height="76" rx="16" fill="none" stroke="#E3DCCE" stroke-width="2.5" stroke-dasharray="6 5"/>
+        </svg>
+        <canvas></canvas>
+        <div class="ph">작은 면에 그려요</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-top:13px;">
+    <div class="field">
+      <label>가장 잘 팔릴 것 같은 기념품과 이유</label>
+      <textarea rows="2" placeholder="누가, 언제, 왜 살까요?"></textarea>
+    </div>
+    <div class="field">
+      <label>가격을 매긴다면?</label>
+      <input type="text" placeholder="예: 부채 3,000원 — 축제 입장객에게">
+    </div>
+  </div>
+
+  <!-- 참고 예시 -->
+  <div class="refs">
+    <h2>참고 · 도시들은 이렇게 만들었어요</h2>
+    <p class="lead">그림 실력보다 아이디어가 먼저입니다. 유명한 도시 브랜드들이 쓴 수법을 살펴보세요.</p>
+    <div class="refgrid">
+      <div class="ref"><span class="city">뉴욕</span><b>기호로 말 줄이기</b><p>'사랑한다'를 하트 기호 하나로 바꿔 글자 없이도 뜻이 통하게 했습니다.</p></div>
+      <div class="ref"><span class="city">암스테르담</span><b>도시 이름 속에 문장 숨기기</b><p>도시 이름 안에 이미 들어 있는 글자를 굵게 해서 '나는 ~이다'라는 문장을 꺼냈습니다.</p></div>
+      <div class="ref"><span class="city">코펜하겐</span><b>이름 쪼개서 새 뜻 만들기</b><p>도시 이름을 나누자 '열려 있다'는 단어가 나타납니다. 개방적인 도시라는 뜻을 담았어요.</p></div>
+      <div class="ref"><span class="city">베를린</span><b>랜드마크를 글자에 끼우기</b><p>도시를 대표하는 건축물을 글자 사이에 그려 넣어 어디인지 바로 알게 했습니다.</p></div>
+      <div class="ref"><span class="city">도쿄</span><b>문장부호 하나로 성격 주기</b><p>느낌표나 접속 기호를 붙여, 도시가 무엇과도 이어진다는 태도를 표현했습니다.</p></div>
+      <div class="ref"><span class="city">서울</span><b>사이에 나를 넣기</b><p>도시 이름 앞뒤에 '나'와 '너'를 놓아, 시민이 브랜드의 주인이 되게 했습니다.</p></div>
+    </div>
+
+    <div class="refslot" id="refslot">
+      <img alt="선생님이 넣은 참고 이미지">
+      <span class="slotmsg">실제 로고 이미지를 넣고 싶다면 아래 버튼으로 자료를 불러오세요</span>
+    </div>
+    <label class="filelabel no-print" style="display:inline-block; margin-top:8px;">
+      참고 이미지 넣기<input type="file" accept="image/*" id="refFile" style="position:absolute;width:1px;height:1px;opacity:0;">
+    </label>
+
+    <div class="field" style="margin:12px 0 0;">
+      <label>이 중 내 로고에 써 본 수법은?<span class="tip">골라서 한 줄로</span></label>
+      <input type="text" placeholder="예: 이름 쪼개기 — '횡성'의 '성'을 성문 모양으로">
+    </div>
+  </div>
+
+  <div class="wrapup">
+    <h2>마무리 · 브랜드가 하는 일</h2>
+    <div class="field" style="margin-bottom:0;">
+      <label>우리 동네 브랜드가 잘 자리 잡으면 동네에 어떤 변화가 생길까요?</label>
+      <textarea rows="2" placeholder="사람, 일자리, 경제, 자부심…"></textarea>
+    </div>
+  </div>
+
+  <p class="pagenum">2 / 2</p>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  /* ─── 그리기 엔진 ─── */
+  var boards = {};
+
+  function makeBoard(wrap){
+    var canvas = wrap.querySelector('canvas');
+    var ctx = canvas.getContext('2d');
+    var b = {
+      wrap: wrap, canvas: canvas, ctx: ctx,
+      color: '#33475B', size: 7, eraser: false,
+      drawing: false, undoStack: [], dirty: false
+    };
+
+    function fit(){
+      var r = wrap.getBoundingClientRect();
+      var dpr = window.devicePixelRatio || 1;
+      var w = Math.max(1, Math.round(r.width)), h = Math.max(1, Math.round(r.height));
+      var prev = null;
+      if(canvas.width && b.dirty){ prev = document.createElement('canvas');
+        prev.width = canvas.width; prev.height = canvas.height;
+        prev.getContext('2d').drawImage(canvas,0,0); }
+      canvas.width = w*dpr; canvas.height = h*dpr;
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      if(prev) ctx.drawImage(prev,0,0,w,h);
+    }
+    b.fit = fit;
+    fit();
+
+    function pos(e){
+      var r = canvas.getBoundingClientRect();
+      return { x: e.clientX - r.left, y: e.clientY - r.top };
+    }
+    function snapshot(){
+      try{
+        b.undoStack.push(canvas.toDataURL());
+        if(b.undoStack.length > 15) b.undoStack.shift();
+      }catch(err){}
+    }
+    b.snapshot = snapshot;
+
+    canvas.addEventListener('pointerdown', function(e){
+      e.preventDefault();
+      snapshot();
+      b.drawing = true;
+      canvas.setPointerCapture(e.pointerId);
+      var p = pos(e);
+      ctx.globalCompositeOperation = b.eraser ? 'destination-out' : 'source-over';
+      ctx.strokeStyle = b.color;
+      ctx.lineWidth = b.eraser ? b.size * 2.6 : b.size;
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      ctx.lineTo(p.x + 0.01, p.y + 0.01);
+      ctx.stroke();
+      b.dirty = true;
+      wrap.classList.add('dirty');
+    });
+    canvas.addEventListener('pointermove', function(e){
+      if(!b.drawing) return;
+      e.preventDefault();
+      var p = pos(e);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+    });
+    ['pointerup','pointercancel','pointerleave'].forEach(function(ev){
+      canvas.addEventListener(ev, function(){
+        if(!b.drawing) return;
+        b.drawing = false;
+        ctx.closePath();
+        ctx.globalCompositeOperation = 'source-over';
+      });
+    });
+
+    b.undo = function(){
+      if(!b.undoStack.length) return;
+      var data = b.undoStack.pop();
+      var img = new Image();
+      img.onload = function(){
+        var r = wrap.getBoundingClientRect();
+        ctx.clearRect(0,0,r.width,r.height);
+        ctx.drawImage(img,0,0,r.width,r.height);
+      };
+      img.src = data;
+    };
+    b.clear = function(){
+      snapshot();
+      var r = wrap.getBoundingClientRect();
+      ctx.clearRect(0,0,r.width,r.height);
+      b.dirty = false;
+      if(!wrap.classList.contains('has-photo')) wrap.classList.remove('dirty');
+    };
+
+    var id = wrap.getAttribute('data-id');
+    boards[id] = b;
+    return b;
+  }
+
+  var wraps = Array.prototype.slice.call(document.querySelectorAll('.canvas-wrap'));
+  wraps.forEach(makeBoard);
+
+  var resizeTimer;
+  window.addEventListener('resize', function(){
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function(){
+      Object.keys(boards).forEach(function(k){ boards[k].fit(); });
+    }, 200);
+  });
+
+  /* ─── 도구 막대 연결 ─── */
+  function targetsOf(bar){
+    var scope = bar.getAttribute('data-for');
+    if(scope === 'logo') return [boards['logo']];
+    return wraps.filter(function(w){ return w.getAttribute('data-group') === 'goods'; })
+                .map(function(w){ return boards[w.getAttribute('data-id')]; });
+  }
+
+  document.querySelectorAll('.drawbar').forEach(function(bar){
+    var targets = targetsOf(bar);
+
+    function setColor(c){
+      targets.forEach(function(b){ b.color = c; b.eraser = false; });
+      bar.querySelectorAll('.swatch').forEach(function(s){
+        s.setAttribute('aria-pressed', String(s.getAttribute('data-color') === c));
+      });
+      var er = bar.querySelector('[data-mode="eraser"]');
+      if(er) er.setAttribute('aria-pressed','false');
+    }
+
+    bar.querySelectorAll('.swatch').forEach(function(s){
+      s.addEventListener('click', function(){ setColor(s.getAttribute('data-color')); });
+    });
+
+    var picker = bar.querySelector('input[type="color"]');
+    if(picker) picker.addEventListener('input', function(){ setColor(picker.value); });
+
+    bar.querySelectorAll('[data-size]').forEach(function(t){
+      t.addEventListener('click', function(){
+        var v = parseInt(t.getAttribute('data-size'),10);
+        targets.forEach(function(b){ b.size = v; });
+        bar.querySelectorAll('[data-size]').forEach(function(o){ o.setAttribute('aria-pressed','false'); });
+        t.setAttribute('aria-pressed','true');
+      });
+    });
+
+    var eraser = bar.querySelector('[data-mode="eraser"]');
+    if(eraser) eraser.addEventListener('click', function(){
+      var on = eraser.getAttribute('aria-pressed') !== 'true';
+      eraser.setAttribute('aria-pressed', String(on));
+      targets.forEach(function(b){ b.eraser = on; });
+      if(on) bar.querySelectorAll('.swatch').forEach(function(s){ s.setAttribute('aria-pressed','false'); });
+    });
+
+    var undoBtn = bar.querySelector('[data-act="undo"]');
+    if(undoBtn) undoBtn.addEventListener('click', function(){ targets.forEach(function(b){ b.undo(); }); });
+
+    var clearBtn = bar.querySelector('[data-act="clear"]');
+    if(clearBtn) clearBtn.addEventListener('click', function(){
+      if(!window.confirm('그린 내용을 모두 지울까요?')) return;
+      targets.forEach(function(b){ b.clear(); });
+    });
+
+    var photo = bar.querySelector('[data-act="photo"]');
+    if(photo) photo.addEventListener('change', function(){
+      var f = photo.files && photo.files[0];
+      if(!f) return;
+      var wrap = boards['logo'].wrap;
+      var img = wrap.querySelector('.bgimg');
+      var reader = new FileReader();
+      reader.onload = function(){
+        img.src = reader.result;
+        img.style.display = 'block';
+        wrap.classList.add('dirty','has-photo');
+      };
+      reader.readAsDataURL(f);
+      photo.value = '';
+    });
+
+    var photoClear = bar.querySelector('[data-act="photo-clear"]');
+    if(photoClear) photoClear.addEventListener('click', function(){
+      var wrap = boards['logo'].wrap;
+      var img = wrap.querySelector('.bgimg');
+      img.removeAttribute('src'); img.style.display = 'none';
+      wrap.classList.remove('has-photo');
+      if(!boards['logo'].dirty) wrap.classList.remove('dirty');
+    });
+  });
+
+  /* ─── 참고 이미지 넣기 ─── */
+  var refFile = document.getElementById('refFile');
+  if(refFile) refFile.addEventListener('change', function(){
+    var f = refFile.files && refFile.files[0];
+    if(!f) return;
+    var slot = document.getElementById('refslot');
+    var reader = new FileReader();
+    reader.onload = function(){
+      slot.querySelector('img').src = reader.result;
+      slot.classList.add('filled');
+    };
+    reader.readAsDataURL(f);
+  });
+
+  /* ─── 입력값을 캡처용 텍스트로 바꿔치기 ─── */
+  function freezeInputs(){
+    var swapped = [];
+    document.querySelectorAll('input[type="text"], textarea').forEach(function(el){
+      var box = document.createElement('div');
+      var cs = window.getComputedStyle(el);
+      box.textContent = el.value || '';
+      box.style.cssText =
+        'font-family:' + cs.fontFamily + ';font-size:' + cs.fontSize + ';color:' + cs.color +
+        ';border:' + cs.borderTopWidth + ' ' + (cs.borderTopStyle === 'none' ? 'solid' : cs.borderTopStyle) + ' ' + cs.borderTopColor +
+        ';border-bottom:' + cs.borderBottomWidth + ' ' + cs.borderBottomStyle + ' ' + cs.borderBottomColor +
+        ';border-radius:' + cs.borderRadius + ';background:#fff;padding:' + cs.padding +
+        ';width:' + el.offsetWidth + 'px;min-height:' + el.offsetHeight + 'px;line-height:1.5;' +
+        'white-space:pre-wrap;word-break:break-word;box-sizing:border-box;';
+      if(cs.borderTopStyle === 'none' && cs.borderBottomStyle !== 'none'){ box.style.border = 'none'; box.style.borderBottom = cs.borderBottomWidth + ' ' + cs.borderBottomStyle + ' ' + cs.borderBottomColor; }
+      el.parentNode.insertBefore(box, el);
+      el.style.display = 'none';
+      swapped.push({el: el, box: box});
+    });
+    return swapped;
+  }
+  function unfreeze(swapped){
+    swapped.forEach(function(s){ s.box.remove(); s.el.style.display = ''; });
+  }
+
+  /* ─── PDF 저장 ─── */
+  var pdfBtn = document.getElementById('pdfBtn');
+  var statusEl = document.getElementById('status');
+
+  pdfBtn.addEventListener('click', function(){
+    if(typeof html2canvas === 'undefined' || !window.jspdf){
+      statusEl.textContent = 'PDF 도구를 불러오지 못했습니다. 인쇄하기 → 대상을 "PDF로 저장"으로 바꾸면 같은 결과가 나옵니다.';
+      return;
+    }
+    run();
+  });
+
+  function run(){
+    pdfBtn.disabled = true;
+    pdfBtn.textContent = '만드는 중…';
+    statusEl.textContent = '두 쪽을 A4로 옮기고 있어요. 잠시만요.';
+    document.body.classList.add('exporting');
+    var swapped = freezeInputs();
+
+    var ready = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+
+    ready.then(function(){
+      var jsPDF = window.jspdf.jsPDF;
+      var pdf = new jsPDF({unit:'mm', format:'a4', orientation:'portrait'});
+      var pages = Array.prototype.slice.call(document.querySelectorAll('.page'));
+      var i = 0;
+
+      function next(){
+        if(i >= pages.length){
+          pdf.save('우리동네_브랜드_기념품.pdf');
+          finish('저장했습니다. 파일 이름은 우리동네_브랜드_기념품.pdf 입니다.');
+          return;
+        }
+        html2canvas(pages[i], {
+          scale: 2, backgroundColor: '#FFFBF2', useCORS: true, logging: false,
+          windowWidth: pages[i].scrollWidth
+        }).then(function(cv){
+          var img = cv.toDataURL('image/jpeg', 0.94);
+          var pw = 210, ph = 297, m = 6;
+          var w = pw - m*2;
+          var h = cv.height * w / cv.width;
+          if(h > ph - m*2){ h = ph - m*2; w = cv.width * h / cv.height; }
+          if(i > 0) pdf.addPage();
+          pdf.addImage(img, 'JPEG', (pw - w)/2, m, w, h);
+          i++; next();
+        }).catch(function(){
+          finish('만드는 도중 문제가 생겼습니다. 인쇄하기 → 대상을 "PDF로 저장"으로 바꿔 보세요.');
+        });
+      }
+      next();
+
+      function finish(msg){
+        unfreeze(swapped);
+        document.body.classList.remove('exporting');
+        pdfBtn.disabled = false;
+        pdfBtn.textContent = 'A4 PDF로 저장';
+        statusEl.textContent = msg;
+        Object.keys(boards).forEach(function(k){ boards[k].fit(); });
+      }
+    });
+  }
+})();
+</script>
+</body>
+</html>
