@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2050년 우리나라 전기, 내가 정한다면?</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{
+  --paper:#EDF1F4;
+  --card:#FFFFFF;
+  --ink:#16283C;
+  --ink-soft:#5A6B7C;
+  --line:#C9D4DD;
+  --coal:#5A5A5A;
+  --lng:#E08A2E;
+  --nuke:#2E7BB8;
+  --solar:#EDB829;
+  --wind:#3F9C82;
+  --good:#2E8B57;
+  --warn:#D68A1E;
+  --bad:#C7453B;
+  --empty:#D3DBE2;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Pretendard Variable',Pretendard,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;
+  background:var(--paper);
+  color:var(--ink);
+  line-height:1.65;
+  font-size:16px;
+  padding:20px 16px 64px;
+  -webkit-text-size-adjust:100%;
+}
+.wrap{max-width:1080px;margin:0 auto}
+h1{font-size:clamp(24px,4.6vw,38px);font-weight:800;letter-spacing:-.02em;line-height:1.25}
+.lede{color:var(--ink-soft);margin-top:8px;font-size:clamp(14px,2.4vw,17px);max-width:60ch}
+
+/* ---------- hero strip ---------- */
+.strip-box{
+  background:var(--card);
+  border:1.5px solid var(--ink);
+  border-radius:10px;
+  padding:18px 18px 12px;
+  margin-top:22px;
+}
+.strip-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:12px}
+.strip-title{font-weight:700;font-size:15px}
+.left-count{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
+.left-count b{font-size:22px}
+.left-count.zero{color:var(--ink-soft)}
+.left-count.some{color:var(--bad)}
+.strip{display:grid;grid-template-columns:repeat(20,1fr);gap:4px}
+.blk{
+  height:46px;border-radius:3px;background:var(--empty);
+  border:1px dashed var(--line);
+  transition:background-color .18s ease,border-color .18s ease;
+}
+.blk.on{border:1px solid rgba(0,0,0,.12);border-style:solid}
+.ruler{display:flex;justify-content:space-between;margin-top:6px;font-size:12px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.shares{margin-top:10px;font-size:13.5px;color:var(--ink-soft);border-top:1px solid var(--line);padding-top:9px}
+.shares b{color:var(--ink)}
+
+/* ---------- columns ---------- */
+.cols{display:grid;grid-template-columns:1fr 380px;gap:20px;margin-top:20px;align-items:start}
+@media (max-width:860px){.cols{grid-template-columns:1fr}}
+
+.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px}
+.panel h2{font-size:17px;font-weight:700;margin-bottom:4px}
+.panel .sub{font-size:13.5px;color:var(--ink-soft);margin-bottom:14px}
+
+/* ---------- source rows ---------- */
+.src{display:grid;grid-template-columns:14px 1fr auto;gap:11px;align-items:center;padding:11px 0;border-top:1px solid var(--line)}
+.src:first-of-type{border-top:none}
+.chip{width:14px;height:14px;border-radius:3px;align-self:start;margin-top:6px}
+.nm{font-weight:700;font-size:16px}
+.desc{font-size:13px;color:var(--ink-soft);line-height:1.5;margin-top:1px}
+.minibar{height:5px;background:var(--empty);border-radius:3px;margin-top:7px;overflow:hidden}
+.minibar span{display:block;height:100%;border-radius:3px;transition:width .18s ease}
+.stepper{display:flex;align-items:center;gap:5px}
+.stepper button{
+  width:38px;height:38px;border-radius:8px;border:1.5px solid var(--ink);
+  background:var(--card);color:var(--ink);font-size:20px;font-weight:700;
+  cursor:pointer;line-height:1;font-family:inherit;
+}
+.stepper button:hover{background:var(--ink);color:#fff}
+.stepper button:disabled{opacity:.28;cursor:not-allowed}
+.stepper button:disabled:hover{background:var(--card);color:var(--ink)}
+.cnt{min-width:56px;text-align:center;font-weight:800;font-size:17px;font-variant-numeric:tabular-nums}
+.cnt small{display:block;font-size:11px;font-weight:600;color:var(--ink-soft);margin-top:-3px}
+
+/* ---------- results ---------- */
+.res{border-top:1px solid var(--line);padding:13px 0}
+.res:first-of-type{border-top:none;padding-top:4px}
+.res-top{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.res-name{font-weight:700;font-size:15px}
+.verdict{font-weight:800;font-size:15px}
+.gauge{position:relative;height:12px;background:var(--empty);border-radius:6px;margin:9px 0 6px;overflow:hidden}
+.zone{position:absolute;top:0;bottom:0;background:rgba(46,139,87,.28)}
+.fill{position:absolute;top:0;bottom:0;left:0;border-radius:6px;transition:width .2s ease,background-color .2s ease}
+.mark{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink)}
+.res-note{font-size:13px;color:var(--ink-soft);line-height:1.5}
+.res-note b{color:var(--ink);font-variant-numeric:tabular-nums}
+.g{color:var(--good)}.w{color:var(--warn)}.b{color:var(--bad)}
+.fg{background:var(--good)}.fw{background:var(--warn)}.fb{background:var(--bad)}
+
+.tip{
+  margin-top:14px;padding:12px 13px;border-radius:8px;
+  background:#F3F7FA;border-left:4px solid var(--ink);
+  font-size:13.5px;line-height:1.6;
+}
+.tip.ok{background:#EFF8F2;border-left-color:var(--good)}
+
+/* ---------- missions ---------- */
+.missions{margin-top:16px;border-top:1px solid var(--line);padding-top:13px}
+.missions h3{font-size:14px;font-weight:700;margin-bottom:9px}
+.mi{display:flex;gap:9px;align-items:flex-start;font-size:14px;padding:5px 0;color:var(--ink-soft)}
+.mi .box{
+  flex:none;width:21px;height:21px;border:1.5px solid var(--line);border-radius:5px;
+  display:grid;place-items:center;font-size:13px;font-weight:800;color:transparent;margin-top:1px;
+}
+.mi.done{color:var(--ink);font-weight:600}
+.mi.done .box{background:var(--good);border-color:var(--good);color:#fff}
+
+/* ---------- buttons ---------- */
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.btn{
+  font-family:inherit;font-size:14px;font-weight:600;padding:10px 15px;border-radius:8px;
+  border:1.5px solid var(--ink);background:var(--card);color:var(--ink);cursor:pointer;
+}
+.btn:hover{background:var(--ink);color:#fff}
+.btn.on{background:var(--ink);color:#fff}
+.viewnote{
+  margin-top:10px;font-size:13.5px;padding:10px 12px;border-radius:8px;
+  background:#FDF6E6;border:1px solid #EBD9AE;
+}
+.viewnote.hide{display:none}
+
+/* ---------- questions ---------- */
+.qs{margin-top:22px}
+.namebar{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:16px}
+.namebar label{font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:7px}
+input[type=text],textarea{
+  font-family:inherit;font-size:15px;color:var(--ink);
+  border:1px solid var(--line);border-radius:7px;padding:9px 11px;background:#FBFCFD;width:100%;
+}
+.namebar input{width:120px}
+textarea{resize:vertical;min-height:64px;line-height:1.6}
+.q{border-top:1px solid var(--line);padding:15px 0}
+.q:first-of-type{border-top:none}
+.q p{font-weight:700;font-size:15.5px;margin-bottom:9px}
+.q .hint{font-weight:400;font-size:13px;color:var(--ink-soft);margin-top:3px}
+.picks{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px}
+.picks label{
+  font-size:14px;padding:8px 13px;border:1.5px solid var(--line);border-radius:20px;
+  cursor:pointer;background:#FBFCFD;
+}
+.picks input{position:absolute;opacity:0;width:0;height:0}
+.picks input:checked + span{font-weight:700}
+.picks label:has(input:checked){border-color:var(--ink);background:var(--ink);color:#fff}
+
+details{margin-top:16px;font-size:14px}
+summary{cursor:pointer;font-weight:600;padding:9px 0;color:var(--ink-soft)}
+details .body{padding:4px 0 8px;color:var(--ink-soft);line-height:1.7}
+details .body b{color:var(--ink)}
+
+:focus-visible{outline:3px solid #2E7BB8;outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (max-width:520px){
+  .blk{height:34px}
+  .strip{gap:3px}
+  .src{grid-template-columns:14px 1fr;gap:9px}
+  .stepper{grid-column:1/-1;justify-content:flex-end}
+}
+
+/* ---------- print ---------- */
+@media print{
+  body{background:#fff;padding:0;font-size:12px}
+  .bar,.stepper,summary,details{display:none}
+  .panel,.strip-box{border:1px solid #999;break-inside:avoid}
+  .cols{grid-template-columns:1fr 1fr}
+  textarea,input[type=text]{border:none;border-bottom:1px solid #999;border-radius:0;background:#fff}
+  .blk{height:22px;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+  .fill,.zone,.chip,.minibar span,.mi .box{print-color-adjust:exact;-webkit-print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>2050년 우리나라 전기, 내가 정한다면?</h1>
+  <p class="lede">2050년에는 지금보다 전기를 2배 더 쓰게 됩니다. 그런데 탄소는 거의 0으로 줄여야 해요.
+  전기 20칸을 다섯 종류의 발전소에 나눠 담아, 2050년 계획을 세워 보세요.</p>
+
+  <!-- HERO -->
+  <div class="strip-box">
+    <div class="strip-head">
+      <span class="strip-title">2050년에 필요한 전기 20칸</span>
+      <span class="left-count" id="leftCount"></span>
+    </div>
+    <div class="strip" id="strip"></div>
+    <div class="ruler"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div>
+    <div class="shares" id="shares"></div>
+  </div>
+
+  <div class="cols">
+
+    <!-- LEFT -->
+    <section class="panel">
+      <h2>발전소에 칸 나눠 담기</h2>
+      <p class="sub">지금(2024년) 우리나라의 모습에서 시작합니다. 칸을 빼야 다른 곳에 넣을 수 있어요.</p>
+      <div id="sources"></div>
+
+      <div class="bar">
+        <button class="btn" id="btnNow">지금(2024년)으로</button>
+        <button class="btn" id="btnGov">정부 2050년 계획 보기</button>
+        <button class="btn" id="btnBack" style="display:none">내 계획으로 돌아가기</button>
+      </div>
+      <div class="viewnote hide" id="viewnote"></div>
+
+      <details>
+        <summary>낱말 도움말</summary>
+        <div class="body">
+          <b>탄소중립</b> — 사람이 내보내는 탄소와 자연이 흡수하는 탄소의 양을 같게 만들어, 결국 늘어나지 않게 하는 것.<br>
+          <b>재생에너지</b> — 햇빛·바람처럼 아무리 써도 없어지지 않는 에너지. 태양광과 풍력이 여기에 들어갑니다.<br>
+          <b>언제든 켤 수 있는 발전소</b> — 날씨와 상관없이 사람이 원할 때 돌릴 수 있는 발전소. 석탄·LNG·원자력이 여기에 들어갑니다.<br>
+          <b>g/kWh</b> — 전기를 일정한 양만큼 만들 때 나오는 탄소의 무게. 숫자가 작을수록 깨끗합니다.
+        </div>
+      </details>
+    </section>
+
+    <!-- RIGHT -->
+    <section class="panel">
+      <h2>내 계획의 결과</h2>
+      <p class="sub">칸을 옮길 때마다 바로 바뀝니다.</p>
+
+      <div class="res">
+        <div class="res-top"><span class="res-name">지구를 지켰나요</span><span class="verdict" id="v1"></span></div>
+        <div class="gauge"><div class="zone" id="z1"></div><div class="fill" id="f1"></div><div class="mark" id="m1"></div></div>
+        <div class="res-note" id="n1"></div>
+      </div>
+
+      <div class="res">
+        <div class="res-top"><span class="res-name">전기요금은 괜찮나요</span><span class="verdict" id="v2"></span></div>
+        <div class="gauge"><div class="zone" id="z2"></div><div class="fill" id="f2"></div><div class="mark" id="m2"></div></div>
+        <div class="res-note" id="n2"></div>
+      </div>
+
+      <div class="res">
+        <div class="res-top"><span class="res-name">정전은 안 나나요</span><span class="verdict" id="v3"></span></div>
+        <div class="gauge"><div class="zone" id="z3"></div><div class="fill" id="f3"></div></div>
+        <div class="res-note" id="n3"></div>
+      </div>
+
+      <div class="tip" id="tip"></div>
+
+      <div class="missions">
+        <h3>하나씩 도전해 보세요</h3>
+        <div class="mi" id="mi1"><span class="box">✓</span><span>1단계 · 탄소를 목표까지 줄이기</span></div>
+        <div class="mi" id="mi2"><span class="box">✓</span><span>2단계 · 탄소를 줄이면서 전기요금도 지키기</span></div>
+        <div class="mi" id="mi3"><span class="box">✓</span><span>3단계 · 정전까지 막아 세 가지 모두 지키기</span></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- QUESTIONS -->
+  <section class="panel qs">
+    <h2>생각해 보기</h2>
+    <p class="sub">계획을 다 세운 뒤에 답해 보세요.</p>
+
+    <div class="namebar">
+      <label>학년·반 <input type="text" id="cls"></label>
+      <label>이름 <input type="text" id="nm"></label>
+    </div>
+
+    <div class="q">
+      <p>1. 계획을 세울 때 무엇을 가장 중요하게 생각했나요?</p>
+      <div class="picks">
+        <label><input type="radio" name="q1"><span>환경 (탄소 줄이기)</span></label>
+        <label><input type="radio" name="q1"><span>안정 (정전 안 나기)</span></label>
+        <label><input type="radio" name="q1"><span>경제 (요금 아끼기)</span></label>
+        <label><input type="radio" name="q1"><span>사회 (주민 갈등 줄이기)</span></label>
+      </div>
+      <textarea placeholder="그것을 고른 이유를 한 문장으로 써 보세요."></textarea>
+    </div>
+
+    <div class="q">
+      <p>2. 지금(2024년)과 내 계획을 비교하면, 가장 크게 달라진 발전소는 무엇인가요?</p>
+      <textarea placeholder="예) 석탄을 30%에서 0%로 줄이고, 그만큼 태양광을 늘렸다."></textarea>
+    </div>
+
+    <div class="q">
+      <p>3. 내 계획대로 하면 어떤 어려움이 생길까요?
+        <span class="hint">예) 태양광을 지을 넓은 땅, 원자력 폐기물, 발전소 근처 주민들의 반대, 사고 위험</span>
+      </p>
+      <textarea></textarea>
+    </div>
+
+    <div class="bar">
+      <button class="btn" onclick="window.print()">인쇄하기</button>
+    </div>
+  </section>
+</div>
+
+<script>
+const SRC = [
+  {id:'coal', name:'석탄',   color:'#5A5A5A', cost:118, co2:820, now:6, gov:0, desc:'24시간 안정적으로 돌아가지만, 탄소를 가장 많이 내뿜어요.'},
+  {id:'lng',  name:'LNG',    color:'#E08A2E', cost:136, co2:490, now:5, gov:1, desc:'빠르게 켜고 끌 수 있어 편리하지만, 연료값이 비싸고 탄소도 나와요.'},
+  {id:'nuke', name:'원자력', color:'#2E7BB8', cost:66,  co2:12,  now:6, gov:5, desc:'값이 싸고 탄소도 거의 없지만, 사고와 폐기물이 걱정돼요.'},
+  {id:'solar',name:'태양광', color:'#EDB829', cost:96,  co2:41,  now:2, gov:8, desc:'탄소가 없지만 밤에는 못 만들고, 넓은 땅이 필요해요.'},
+  {id:'wind', name:'풍력',   color:'#3F9C82', cost:93,  co2:11,  now:1, gov:6, desc:'탄소가 없지만 바람이 멈추면 못 만들고, 소음 문제가 있어요.'}
+];
+const TOTAL = 20, DEMAND = 1200;
+const NOW_CO2 = 377, NOW_COST = 104;
+
+let blocks = {}, saved = null, viewing = 'mine';
+SRC.forEach(s => blocks[s.id] = s.now);
+
+const $ = id => document.getElementById(id);
+const sum = () => SRC.reduce((a,s)=>a+blocks[s.id],0);
+
+/* ---- build source rows ---- */
+$('sources').innerHTML = SRC.map(s=>`
+  <div class="src">
+    <span class="chip" style="background:${s.color}"></span>
+    <div>
+      <div class="nm">${s.name}</div>
+      <div class="desc">${s.desc}</div>
+      <div class="minibar"><span id="mb-${s.id}" style="background:${s.color}"></span></div>
+    </div>
+    <div class="stepper">
+      <button data-a="-" data-s="${s.id}" aria-label="${s.name} 한 칸 줄이기">−</button>
+      <span class="cnt"><span id="c-${s.id}">0</span>칸<small id="p-${s.id}"></small></span>
+      <button data-a="+" data-s="${s.id}" aria-label="${s.name} 한 칸 늘리기">+</button>
+    </div>
+  </div>`).join('');
+
+$('sources').addEventListener('click', e=>{
+  const b = e.target.closest('button[data-s]'); if(!b) return;
+  const id = b.dataset.s;
+  if(b.dataset.a === '+'){ if(sum() < TOTAL) blocks[id]++; }
+  else { if(blocks[id] > 0) blocks[id]--; }
+  if(viewing !== 'mine'){ viewing = 'mine'; saved = null; syncButtons(); }
+  render();
+});
+
+/* ---- strip ---- */
+$('strip').innerHTML = Array.from({length:TOTAL},(_,i)=>`<div class="blk" id="b${i}"></div>`).join('');
+
+function tons(c){
+  const man = c * 120;
+  return man >= 10000 ? (man/10000).toFixed(1)+'억 톤' : Math.round(man).toLocaleString()+'만 톤';
+}
+
+function render(){
+  const used = sum(), left = TOTAL - used;
+
+  // strip
+  let i = 0;
+  SRC.forEach(s=>{ for(let k=0;k<blocks[s.id];k++){ const el=$('b'+i++); el.className='blk on'; el.style.background=s.color; } });
+  for(;i<TOTAL;i++){ const el=$('b'+i); el.className='blk'; el.style.background=''; }
+
+  $('leftCount').innerHTML = left === 0
+    ? '남은 칸 <b>0</b> · 20칸을 모두 썼어요'
+    : '남은 칸 <b>'+left+'</b> · 전기가 모자라요';
+  $('leftCount').className = 'left-count ' + (left===0 ? 'zero' : 'some');
+
+  // per source
+  SRC.forEach(s=>{
+    $('c-'+s.id).textContent = blocks[s.id];
+    $('p-'+s.id).textContent = (blocks[s.id]*5) + '%';
+    $('mb-'+s.id).style.width = (blocks[s.id]/TOTAL*100) + '%';
+  });
+  document.querySelectorAll('button[data-a="+"]').forEach(b=> b.disabled = (used>=TOTAL));
+  document.querySelectorAll('button[data-a="-"]').forEach(b=> b.disabled = (blocks[b.dataset.s]===0));
+
+  // numbers
+  const co2  = used ? SRC.reduce((a,s)=>a+blocks[s.id]*s.co2,0)/used : 0;
+  const cost = used ? SRC.reduce((a,s)=>a+blocks[s.id]*s.cost,0)/used : 0;
+  const firm = (blocks.coal+blocks.lng+blocks.nuke)/TOTAL*100;
+  const renew = (blocks.solar+blocks.wind)/TOTAL*100;
+
+  $('shares').innerHTML = `재생에너지(태양광+풍력) <b>${renew}%</b> · 언제든 켤 수 있는 발전소(석탄+LNG+원자력) <b>${firm}%</b>`;
+
+  // 1. carbon
+  const okC = co2 <= 50, midC = co2 <= 120;
+  set(1, okC?'좋음':midC?'아슬아슬':'위험', okC?'g':midC?'w':'b',
+      Math.min(co2/500*100,100), 50/500*100, NOW_CO2/500*100,
+      `탄소 <b>${Math.round(co2)}</b> (목표 50 이하) · 2050년 한 해에 약 <b>${tons(co2)}</b>이 나와요.`);
+
+  // 2. cost
+  const okP = cost <= 110, midP = cost <= 125;
+  const diff = Math.round(cost - NOW_COST);
+  set(2, okP?'좋음':midP?'아슬아슬':'위험', okP?'g':midP?'w':'b',
+      Math.min(Math.max((cost-60)/80*100,0),100), (110-60)/80*100, (NOW_COST-60)/80*100,
+      `전기값 <b>${Math.round(cost)}원</b> · 지금(104원)보다 <b>${Math.abs(diff)}원 ${diff>0?'비싸요':diff<0?'싸요':'같아요'}</b>`);
+
+  // 3. stability
+  const okS = firm >= 30, midS = firm >= 25;
+  set(3, okS?'좋음':midS?'아슬아슬':'위험', okS?'g':midS?'w':'b',
+      Math.min(firm,100), null, null,
+      `해가 지고 바람이 멈춰도 돌릴 수 있는 발전소가 <b>${firm}%</b> (30% 이상 필요)`);
+  $('z3').style.left = '30%'; $('z3').style.right = '0';
+
+  // tip
+  const t = $('tip');
+  let msg, ok = false;
+  if(left > 0){
+    msg = `아직 ${left}칸이 비어 있어요. 전기가 모자라면 정전이 납니다. 20칸을 모두 채워 주세요.`;
+  } else if(!okC && blocks.coal > 0){
+    msg = '석탄 한 칸이 탄소를 가장 많이 늘려요. 석탄부터 줄여 보세요.';
+  } else if(!okC && blocks.lng > 2){
+    msg = 'LNG도 석탄의 절반쯤 탄소를 내뿜어요. LNG를 줄이면 목표에 가까워집니다.';
+  } else if(!okC){
+    msg = '탄소가 적은 발전소는 원자력, 풍력, 태양광이에요. 이 셋을 늘려 보세요.';
+  } else if(!okS){
+    msg = '태양광과 풍력만으로는 밤이나 바람 없는 날에 전기가 끊길 수 있어요. 언제든 켤 수 있는 발전소(원자력·LNG)를 30% 이상 두어야 해요.';
+  } else if(!okP){
+    msg = 'LNG는 연료값이 비싸서 요금을 크게 올려요. 원자력이나 풍력으로 바꿔 보세요.';
+  } else {
+    msg = '세 가지 목표를 모두 지켰어요. 정부 2050년 계획과 비교해 보세요.'; ok = true;
+  }
+  t.textContent = msg;
+  t.className = 'tip' + (ok ? ' ok' : '');
+
+  // missions
+  mission('mi1', okC && left===0);
+  mission('mi2', okC && okP && left===0);
+  mission('mi3', okC && okP && okS && left===0);
+}
+
+function set(n, word, cls, pct, zoneEnd, markPos, note){
+  $('v'+n).textContent = word;
+  $('v'+n).className = 'verdict ' + cls;
+  $('f'+n).style.width = pct + '%';
+  $('f'+n).className = 'fill f' + cls;
+  $('n'+n).innerHTML = note;
+  if(zoneEnd !== null){ $('z'+n).style.left = '0'; $('z'+n).style.width = zoneEnd + '%'; }
+  if(markPos !== null && $('m'+n)) $('m'+n).style.left = markPos + '%';
+}
+
+function mission(id, done){ $(id).className = 'mi' + (done ? ' done' : ''); }
+
+/* ---- preset buttons ---- */
+function syncButtons(){
+  $('btnNow').classList.toggle('on', viewing==='now');
+  $('btnGov').classList.toggle('on', viewing==='gov');
+  $('btnBack').style.display = (viewing==='mine') ? 'none' : 'inline-block';
+  const v = $('viewnote');
+  if(viewing==='gov'){
+    v.className='viewnote';
+    v.textContent='정부 2050년 계획입니다. 재생에너지를 70%까지 늘리고 석탄은 아예 없앴어요. 대신 언제든 켤 수 있는 발전소를 딱 30%만 남겨 두었습니다.';
+  } else if(viewing==='now'){
+    v.className='viewnote';
+    v.textContent='2024년 지금의 모습입니다. 탄소 목표를 한참 넘고 있어요.';
+  } else v.className='viewnote hide';
+}
+function load(kind){
+  if(viewing==='mine') saved = {...blocks};
+  viewing = kind;
+  SRC.forEach(s => blocks[s.id] = (kind==='gov' ? s.gov : s.now));
+  syncButtons(); render();
+}
+$('btnNow').onclick = ()=> load('now');
+$('btnGov').onclick = ()=> load('gov');
+$('btnBack').onclick = ()=>{ if(saved) blocks = {...saved}; viewing='mine'; syncButtons(); render(); };
+
+syncButtons();
+render();
+</script>
+</body>
+</html>
